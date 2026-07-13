@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap');
+
+body {
+  background-color: #0B0F14;
+  background-image:
+    radial-gradient(circle at 15% 0%, rgba(45, 212, 191, 0.06), transparent 40%),
+    radial-gradient(circle at 85% 100%, rgba(255, 77, 79, 0.05), transparent 45%);
+  color: #E7ECF0;
+}
+
+::selection {
+  background: #2DD4BF;
+  color: #0B0F14;
+}
+
+.severity-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+}
+
+@keyframes ticker-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.ticker-track {
+  animation: ticker-scroll 32s linear infinite;
+}
+.ticker-track:hover {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track {
+    animation: none;
+  }
+}

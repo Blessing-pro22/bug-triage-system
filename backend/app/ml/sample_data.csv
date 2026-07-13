@@ -1,0 +1,41 @@
+title,description,severity,team
+"App crashes on login","Application throws a null pointer exception and crashes immediately when user taps login button",critical,backend
+"Server 500 error on checkout","Checkout API returns 500 internal server error intermittently under load",critical,backend
+"Database connection pool exhausted","Production database connection pool runs out under peak traffic causing timeouts",critical,backend
+"Payment gateway timeout","Payment provider times out and transaction is not rolled back correctly",critical,backend
+"Memory leak in background worker","Worker process memory grows unbounded and eventually OOM kills the service",critical,backend
+"Data corruption in orders table","Concurrent writes cause order records to be partially overwritten",critical,backend
+"Authentication bypass vulnerability","Users can access another account's data by modifying the request token",critical,security
+"SQL injection in search endpoint","Unsanitized input in search query allows arbitrary SQL execution",critical,security
+"Session tokens not expiring","Expired sessions still authenticate successfully after logout",critical,security
+"Button misaligned on mobile","Submit button overlaps with the footer on small screen widths",minor,frontend
+"Typo in settings page","Settings page label says 'Prefrences' instead of 'Preferences'",minor,frontend
+"Tooltip shows wrong text","Hover tooltip on the dashboard icon shows outdated helper text",minor,frontend
+"Dark mode color inconsistency","Card background color does not match the rest of dark mode theme",minor,frontend
+"Icon missing on empty state","Empty state illustration icon fails to load and shows broken image",minor,frontend
+"Placeholder text cut off","Search bar placeholder text is truncated on narrower viewports",minor,frontend
+"Slow page load on dashboard","Dashboard takes over 8 seconds to load with more than 500 records",major,backend
+"Pagination breaks on filter change","Changing a filter resets pagination to page 1 unexpectedly, losing state",major,frontend
+"Export to CSV produces malformed file","CSV export includes broken line endings causing Excel import errors",major,backend
+"Notifications delayed by hours","Push notifications arrive several hours after the triggering event",major,backend
+"Search results out of date","Search index is not refreshed after a record update for up to 30 minutes",major,backend
+"Form validation allows invalid email","Signup form accepts clearly invalid email formats without error",major,frontend
+"Chart rendering wrong values","Analytics dashboard chart displays incorrect aggregated totals",major,frontend
+"API returns wrong currency symbol","Localized currency symbol shown incorrectly for non-US locales",minor,frontend
+"Duplicate entries in reports","Monthly report generator occasionally lists the same record twice",major,backend
+"Login button unresponsive on Safari","Clicking login on Safari browser does nothing, no console error shown",major,frontend
+"Feature request: dark mode schedule","Users want dark mode to auto-switch based on system time",trivial,frontend
+"Feature request: bulk export","Users want to export multiple reports at once instead of one by one",trivial,backend
+"Improve error message wording","Generic error messages are unhelpful and should describe the actual issue",trivial,frontend
+"Add loading spinner to save button","Save button gives no feedback while the request is in flight",trivial,frontend
+"Rename internal field label","Internal admin field label is inconsistent with new terminology",trivial,frontend
+"Crash on empty file upload","Uploading a zero-byte file crashes the upload service",critical,backend
+"Unauthorized admin panel access","Non-admin users can reach admin routes by guessing the URL",critical,security
+"XSS in comment field","Comment field does not escape HTML allowing script injection",critical,security
+"Race condition in inventory update","Concurrent purchases can oversell inventory due to a race condition",critical,backend
+"Timezone displayed incorrectly","Event times shown in UTC instead of the user's local timezone",major,frontend
+"Broken link in footer","Footer 'About Us' link points to a 404 page",minor,frontend
+"Inconsistent spacing on cards","Card padding differs slightly between list and grid view",minor,frontend
+"Slow API response for reports endpoint","Reports endpoint takes over 5 seconds on large date ranges",major,backend
+"Password reset email not sent","Users report never receiving the password reset email",critical,backend
+"Two-factor code rejected incorrectly","Valid two-factor authentication codes are sometimes rejected",critical,security
