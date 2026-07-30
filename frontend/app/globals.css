@@ -4,11 +4,17 @@
 
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap');
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   background-color: #0B0F14;
   background-image:
-    radial-gradient(circle at 15% 0%, rgba(45, 212, 191, 0.06), transparent 40%),
-    radial-gradient(circle at 85% 100%, rgba(255, 77, 79, 0.05), transparent 45%);
+    radial-gradient(circle at 15% 0%, rgba(45, 212, 191, 0.08), transparent 50%),
+    radial-gradient(circle at 85% 100%, rgba(255, 77, 79, 0.06), transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(45, 212, 191, 0.03), transparent 70%);
+  background-attachment: fixed;
   color: #E7ECF0;
 }
 
@@ -39,4 +45,45 @@ body {
   .ticker-track {
     animation: none;
   }
+  .animate-fade-in,
+  .animate-fade-in-up,
+  .animate-fade-out,
+  .animate-ping,
+  .animate-pulse {
+    animation: none;
+  }
+}
+
+/* Splash screen animations */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fade-in-up {
+  from { 
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out 0.2s both;
+}
+
+.animate-fade-out {
+  animation: fade-out 0.5s ease-in 2s both;
 }
