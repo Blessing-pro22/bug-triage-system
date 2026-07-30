@@ -2,7 +2,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export type Severity = "trivial" | "minor" | "major" | "critical";
 export type Team = "frontend" | "backend" | "security";
-export type Status = "open" | "in_progress" | "resolved" | "closed";
+export type Status = "new" | "triaged" | "assigned" | "in_progress" | "resolved" | "closed" | "reopened";
 
 export interface Bug {
   id: number;
@@ -35,6 +35,35 @@ export interface TrendPoint {
   count: number;
 }
 
+export interface Feedback {
+  id: number;
+  bug_id: number;
+  original_severity: Severity;
+  original_team: Team;
+  corrected_severity: Severity | null;
+  corrected_team: Team | null;
+  created_at: string;
+}
+
+export interface ActivityLog {
+  id: number;
+  bug_id: number;
+  action: string;
+  details: string;
+  user: string;
+  created_at: string;
+}
+
+export interface AIPerformance {
+  classification_accuracy: number;
+  precision: number;
+  recall: number;
+  f1_score: number;
+  total_predictions: number;
+  correct_predictions: number;
+  human_corrections: number;
+}
+
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${API_URL}${path}`, {
     headers: { "Content-Type": "application/json" },
@@ -59,6 +88,10 @@ export const api = {
   updateBug: (id: number, data: Partial<{ status: Status; final_severity: Severity; final_team: Team }>) =>
     request<Bug>(`/api/bugs/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
   deleteBug: (id: number) => request<void>(`/api/bugs/${id}`, { method: "DELETE" }),
+  submitFeedback: (bugId: number, data: { corrected_severity?: Severity; corrected_team?: Team }) =>
+    request<Feedback>(`/api/bugs/${bugId}/feedback`, { method: "POST", body: JSON.stringify(data) }),
+  getActivityLog: () => request<ActivityLog[]>("/api/activity"),
+  getAIPerformance: () => request<AIPerformance>("/api/analytics/ai-performance"),
   analyticsSummary: () => request<AnalyticsSummary>("/api/analytics/summary"),
   analyticsTrend: () => request<TrendPoint[]>("/api/analytics/trend"),
 };

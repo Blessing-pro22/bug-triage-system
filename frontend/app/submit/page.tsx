@@ -3,25 +3,35 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { api, Bug } from "@/lib/api";
 import { SeverityBadge, TeamBadge } from "@/components/Badges";
-import { Send, Plus, ArrowRight, CheckCircle2, AlertCircle } from "lucide-react";
+import { Send, Plus, ArrowRight, CheckCircle2, AlertCircle, Brain, Loader2 } from "lucide-react";
 
 export default function SubmitPage() {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [steps, setSteps] = useState("");
+  const [expected, setExpected] = useState("");
+  const [actual, setActual] = useState("");
+  const [environment, setEnvironment] = useState("");
   const [reporter, setReporter] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [analyzing, setAnalyzing] = useState(false);
   const [result, setResult] = useState<Bug | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitting(true);
+    setAnalyzing(true);
     setError(null);
     try {
+      // Simulate AI analysis delay
+      await new Promise(resolve => setTimeout(resolve, 1500));
       const bug = await api.submitBug({ title, description, reporter: reporter || undefined });
+      setAnalyzing(false);
       setResult(bug);
     } catch (err: any) {
+      setAnalyzing(false);
       setError(err.message || "Something went wrong submitting the report.");
     } finally {
       setSubmitting(false);
@@ -93,11 +103,52 @@ export default function SubmitPage() {
         <Field label="Description">
           <textarea
             required
-            rows={5}
+            rows={4}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="What did you expect to happen, and what happened instead? Include steps to reproduce if you have them."
+            placeholder="Describe what happened in detail..."
             className="w-full bg-panel/50 border border-line/50 rounded-xl px-4 py-3.5 text-paper placeholder:text-paper/25 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/50 transition-all duration-200 resize-none font-sans"
+          />
+        </Field>
+
+        <Field label="Steps to reproduce (optional)">
+          <textarea
+            rows={3}
+            value={steps}
+            onChange={(e) => setSteps(e.target.value)}
+            placeholder="1. Open login page
+2. Enter credentials
+3. Click login button"
+            className="w-full bg-panel/50 border border-line/50 rounded-xl px-4 py-3.5 text-paper placeholder:text-paper/25 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/50 transition-all duration-200 resize-none font-sans"
+          />
+        </Field>
+
+        <div className="grid md:grid-cols-2 gap-4">
+          <Field label="Expected result (optional)">
+            <input
+              value={expected}
+              onChange={(e) => setExpected(e.target.value)}
+              placeholder="User should be logged in"
+              className="w-full bg-panel/50 border border-line/50 rounded-xl px-4 py-3.5 text-paper placeholder:text-paper/25 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/50 transition-all duration-200 font-sans"
+            />
+          </Field>
+
+          <Field label="Actual result (optional)">
+            <input
+              value={actual}
+              onChange={(e) => setActual(e.target.value)}
+              placeholder="Login fails with error message"
+              className="w-full bg-panel/50 border border-line/50 rounded-xl px-4 py-3.5 text-paper placeholder:text-paper/25 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/50 transition-all duration-200 font-sans"
+            />
+          </Field>
+        </div>
+
+        <Field label="Environment (optional)">
+          <input
+            value={environment}
+            onChange={(e) => setEnvironment(e.target.value)}
+            placeholder="Browser: Chrome, OS: Windows 11, Version: 2.4.1"
+            className="w-full bg-panel/50 border border-line/50 rounded-xl px-4 py-3.5 text-paper placeholder:text-paper/25 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/50 transition-all duration-200 font-sans"
           />
         </Field>
 
@@ -122,10 +173,15 @@ export default function SubmitPage() {
           disabled={submitting}
           className="w-full inline-flex items-center justify-center gap-2 font-mono text-xs uppercase tracking-wider px-6 py-4 rounded-xl bg-gradient-to-r from-accent to-accent/80 text-ink hover:from-accent/90 hover:to-accent/70 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
         >
-          {submitting ? (
+          {analyzing ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              AI is analyzing your report...
+            </>
+          ) : submitting ? (
             <>
               <div className="w-4 h-4 border-2 border-ink border-t-transparent rounded-full animate-spin" />
-              Classifying…
+              Submitting...
             </>
           ) : (
             <>

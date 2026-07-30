@@ -26,8 +26,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </span>
             </a>
             <nav className="flex items-center gap-2 bg-panel/50 rounded-xl border border-line/50 px-2 py-1.5 backdrop-blur-sm">
-              <a href="/" className="font-mono text-xs uppercase tracking-wider text-paper/50 hover:text-accent px-4 py-2 rounded-lg hover:bg-accent/10 transition-all duration-200">
+              <a href="/landing" className="font-mono text-xs uppercase tracking-wider text-paper/50 hover:text-accent px-4 py-2 rounded-lg hover:bg-accent/10 transition-all duration-200">
+                Home
+              </a>
+              <a href="/dashboard" className="font-mono text-xs uppercase tracking-wider text-paper/50 hover:text-accent px-4 py-2 rounded-lg hover:bg-accent/10 transition-all duration-200">
                 Dashboard
+              </a>
+              <a href="/analytics" className="font-mono text-xs uppercase tracking-wider text-paper/50 hover:text-accent px-4 py-2 rounded-lg hover:bg-accent/10 transition-all duration-200">
+                Analytics
               </a>
               <a href="/submit" className="font-mono text-xs uppercase tracking-wider text-paper/50 hover:text-accent px-4 py-2 rounded-lg hover:bg-accent/10 transition-all duration-200">
                 Report a bug

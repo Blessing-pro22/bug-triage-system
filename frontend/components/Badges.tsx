@@ -34,10 +34,13 @@ export function TeamBadge({ team }: { team: string }) {
 
 export function StatusBadge({ status }: { status: string }) {
   const map: Record<string, string> = {
-    open: "text-accent border-accent/40 bg-accent/10",
-    in_progress: "text-[#F4D35E] border-[#F4D35E]/40 bg-[#F4D35E]/10",
+    new: "text-accent border-accent/40 bg-accent/10",
+    triaged: "text-[#2DD4BF] border-[#2DD4BF]/40 bg-[#2DD4BF]/10",
+    assigned: "text-[#F4D35E] border-[#F4D35E]/40 bg-[#F4D35E]/10",
+    in_progress: "text-[#FF9F43] border-[#FF9F43]/40 bg-[#FF9F43]/10",
     resolved: "text-paper/60 border-line bg-panel",
     closed: "text-paper/40 border-line bg-panel",
+    reopened: "text-signal-critical border-signal-critical/40 bg-signal-critical/10",
   };
   return (
     <span className={`inline-flex font-mono text-[11px] uppercase tracking-wider px-2 py-1 rounded-sm border ${map[status] || ""}`}>

@@ -8,19 +8,11 @@ export default function SplashScreen() {
 
   useEffect(() => {
     setMounted(true);
-    // Check if user has already seen the splash screen in this session
-    const hasSeenSplash = sessionStorage.getItem("hasSeenSplash");
-    
-    if (hasSeenSplash) {
+    // Show splash screen on every page refresh and hide after animation
+    const timer = setTimeout(() => {
       setVisible(false);
-    } else {
-      // Mark as seen and hide after animation
-      sessionStorage.setItem("hasSeenSplash", "true");
-      const timer = setTimeout(() => {
-        setVisible(false);
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
+    }, 2500);
+    return () => clearTimeout(timer);
   }, []);
 
   if (!visible || !mounted) return null;
