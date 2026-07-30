@@ -35,9 +35,9 @@ export default function AnalyticsPage() {
   if (loading) {
     return (
       <div className="max-w-6xl mx-auto mt-12">
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-32 bg-panel/50 rounded-xl animate-pulse" />
+            <div key={i} className="h-28 sm:h-32 bg-panel/50 rounded-xl animate-pulse" />
           ))}
         </div>
       </div>
@@ -120,17 +120,17 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Key Metrics */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-10">
         {metrics.map((metric, index) => (
           <div
             key={index}
-            className={`relative overflow-hidden rounded-xl p-6 bg-gradient-to-br ${metric.bgColor} border ${metric.borderColor} backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow duration-300`}
+            className={`relative overflow-hidden rounded-xl p-4 sm:p-6 bg-gradient-to-br ${metric.bgColor} border ${metric.borderColor} backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow duration-300`}
           >
             <div className="absolute top-0 right-0 p-3 opacity-10">
               {metric.icon}
             </div>
-            <div className={`font-mono text-3xl font-bold ${metric.color} mb-2`}>{metric.value}</div>
-            <div className="text-paper/60 text-xs font-mono uppercase tracking-wider flex items-center gap-2">
+            <div className={`font-mono text-2xl sm:text-3xl font-bold ${metric.color} mb-2`}>{metric.value}</div>
+            <div className="text-paper/60 text-[10px] sm:text-xs font-mono uppercase tracking-wider flex items-center gap-2">
               <span className={metric.color}>{metric.icon}</span>
               {metric.label}
             </div>
@@ -139,57 +139,57 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Detailed Stats */}
-      <div className="grid md:grid-cols-2 gap-6 mb-10">
-        <div className="rounded-2xl p-6 bg-gradient-to-br from-panel/50 to-panel/30 border border-line/50 backdrop-blur-sm shadow-xl">
-          <div className="flex items-center gap-3 mb-6">
+      <div className="grid md:grid-cols-2 gap-4 sm:gap-6 mb-8 sm:mb-10">
+        <div className="rounded-2xl p-4 sm:p-6 bg-gradient-to-br from-panel/50 to-panel/30 border border-line/50 backdrop-blur-sm shadow-xl">
+          <div className="flex items-center gap-3 mb-4 sm:mb-6">
             <div className="p-2 bg-panel/50 rounded-lg">
-              <BarChart3 className="w-5 h-5 text-paper/60" />
+              <BarChart3 className="w-4 sm:w-5 h-4 sm:h-5 text-paper/60" />
             </div>
-            <h2 className="font-mono text-lg font-bold tracking-tight text-white">Prediction Statistics</h2>
+            <h2 className="font-mono text-base sm:text-lg font-bold tracking-tight text-white">Prediction Statistics</h2>
           </div>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between p-4 bg-panel/30 rounded-xl border border-line/50">
-              <div className="flex items-center gap-3">
+          <div className="space-y-3 sm:space-y-4">
+            <div className="flex items-center justify-between p-3 sm:p-4 bg-panel/30 rounded-xl border border-line/50">
+              <div className="flex items-center gap-2 sm:gap-3">
                 <div className="p-2 bg-accent/20 rounded-lg">
-                  <Activity className="w-4 h-4 text-accent" />
+                  <Activity className="w-3 sm:w-4 h-3 sm:h-4 text-accent" />
                 </div>
-                <span className="text-paper/80">Total Predictions</span>
+                <span className="text-paper/80 text-xs sm:text-sm">Total Predictions</span>
               </div>
-              <span className="font-mono text-xl font-bold text-white">{performance.total_predictions}</span>
+              <span className="font-mono text-lg sm:text-xl font-bold text-white">{performance.total_predictions}</span>
             </div>
-            <div className="flex items-center justify-between p-4 bg-panel/30 rounded-xl border border-line/50">
-              <div className="flex items-center gap-3">
+            <div className="flex items-center justify-between p-3 sm:p-4 bg-panel/30 rounded-xl border border-line/50">
+              <div className="flex items-center gap-2 sm:gap-3">
                 <div className="p-2 bg-accent/20 rounded-lg">
-                  <CheckCircle2 className="w-4 h-4 text-accent" />
+                  <CheckCircle2 className="w-3 sm:w-4 h-3 sm:h-4 text-accent" />
                 </div>
-                <span className="text-paper/80">Correct Predictions</span>
+                <span className="text-paper/80 text-xs sm:text-sm">Correct Predictions</span>
               </div>
-              <span className="font-mono text-xl font-bold text-accent">{performance.correct_predictions}</span>
+              <span className="font-mono text-lg sm:text-xl font-bold text-accent">{performance.correct_predictions}</span>
             </div>
-            <div className="flex items-center justify-between p-4 bg-panel/30 rounded-xl border border-line/50">
-              <div className="flex items-center gap-3">
+            <div className="flex items-center justify-between p-3 sm:p-4 bg-panel/30 rounded-xl border border-line/50">
+              <div className="flex items-center gap-2 sm:gap-3">
                 <div className="p-2 bg-signal-major/20 rounded-lg">
-                  <AlertCircle className="w-4 h-4 text-signal-major" />
+                  <AlertCircle className="w-3 sm:w-4 h-3 sm:h-4 text-signal-major" />
                 </div>
-                <span className="text-paper/80">Human Corrections</span>
+                <span className="text-paper/80 text-xs sm:text-sm">Human Corrections</span>
               </div>
-              <span className="font-mono text-xl font-bold text-signal-major">{performance.human_corrections}</span>
+              <span className="font-mono text-lg sm:text-xl font-bold text-signal-major">{performance.human_corrections}</span>
             </div>
           </div>
         </div>
 
-        <div className="rounded-2xl p-6 bg-gradient-to-br from-panel/50 to-panel/30 border border-line/50 backdrop-blur-sm shadow-xl">
-          <div className="flex items-center gap-3 mb-6">
+        <div className="rounded-2xl p-4 sm:p-6 bg-gradient-to-br from-panel/50 to-panel/30 border border-line/50 backdrop-blur-sm shadow-xl">
+          <div className="flex items-center gap-3 mb-4 sm:mb-6">
             <div className="p-2 bg-panel/50 rounded-lg">
-              <PieChart className="w-5 h-5 text-paper/60" />
+              <PieChart className="w-4 sm:w-5 h-4 sm:h-5 text-paper/60" />
             </div>
-            <h2 className="font-mono text-lg font-bold tracking-tight text-white">Model Health</h2>
+            <h2 className="font-mono text-base sm:text-lg font-bold tracking-tight text-white">Model Health</h2>
           </div>
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-paper/60 text-sm">Accuracy Trend</span>
-                <span className="text-accent font-mono text-sm">+2.3%</span>
+                <span className="text-paper/60 text-xs sm:text-sm">Accuracy Trend</span>
+                <span className="text-accent font-mono text-xs sm:text-sm">+2.3%</span>
               </div>
               <div className="h-2 bg-panel/50 rounded-full overflow-hidden">
                 <div className="h-full bg-gradient-to-r from-accent to-accent/70 transition-all duration-500" style={{ width: '78%' }} />
@@ -197,8 +197,8 @@ export default function AnalyticsPage() {
             </div>
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-paper/60 text-sm">Confidence Score</span>
-                <span className="text-[#2DD4BF] font-mono text-sm">High</span>
+                <span className="text-paper/60 text-xs sm:text-sm">Confidence Score</span>
+                <span className="text-[#2DD4BF] font-mono text-xs sm:text-sm">High</span>
               </div>
               <div className="h-2 bg-panel/50 rounded-full overflow-hidden">
                 <div className="h-full bg-gradient-to-r from-[#2DD4BF] to-[#2DD4BF]/70 transition-all duration-500" style={{ width: '85%' }} />
@@ -206,8 +206,8 @@ export default function AnalyticsPage() {
             </div>
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-paper/60 text-sm">Training Progress</span>
-                <span className="text-[#F4D35E] font-mono text-sm">In Progress</span>
+                <span className="text-paper/60 text-xs sm:text-sm">Training Progress</span>
+                <span className="text-[#F4D35E] font-mono text-xs sm:text-sm">In Progress</span>
               </div>
               <div className="h-2 bg-panel/50 rounded-full overflow-hidden">
                 <div className="h-full bg-gradient-to-r from-[#F4D35E] to-[#F4D35E]/70 transition-all duration-500" style={{ width: '62%' }} />
@@ -218,14 +218,14 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Info Section */}
-      <div className="rounded-2xl p-6 bg-gradient-to-br from-accent/10 to-accent/5 border border-accent/30 backdrop-blur-sm shadow-xl">
-        <div className="flex items-start gap-4">
+      <div className="rounded-2xl p-4 sm:p-6 bg-gradient-to-br from-accent/10 to-accent/5 border border-accent/30 backdrop-blur-sm shadow-xl">
+        <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
           <div className="p-3 bg-accent/20 rounded-xl shrink-0">
-            <Brain className="w-6 h-6 text-accent" />
+            <Brain className="w-5 h-5 sm:w-6 sm:h-6 text-accent" />
           </div>
           <div>
-            <h3 className="font-bold text-lg text-white mb-2">About AI Performance Metrics</h3>
-            <div className="text-paper/70 text-sm space-y-2">
+            <h3 className="font-bold text-base sm:text-lg text-white mb-2">About AI Performance Metrics</h3>
+            <div className="text-paper/70 text-xs sm:text-sm space-y-2">
               <p><strong>Classification Accuracy:</strong> Percentage of correct predictions across all classifications.</p>
               <p><strong>Precision:</strong> How many selected items are relevant (true positives / (true positives + false positives)).</p>
               <p><strong>Recall:</strong> How many relevant items are selected (true positives / (true positives + false negatives)).</p>

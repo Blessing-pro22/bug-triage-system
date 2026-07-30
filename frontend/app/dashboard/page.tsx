@@ -79,10 +79,10 @@ export default function DashboardPage() {
     <div className="animate-fade-in">
       <TriageTicker bugs={bugs} />
 
-      <section className="mb-10">
-        <div className="flex items-center justify-between mb-6">
+      <section className="mb-8 sm:mb-10">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <div>
-            <h1 className="font-mono text-3xl font-bold tracking-tight mb-2 text-white">Triage queue</h1>
+            <h1 className="font-mono text-2xl sm:text-3xl font-bold tracking-tight mb-2 text-white">Triage queue</h1>
             <p className="text-paper/50 text-sm max-w-2xl">
               Every report below was classified automatically on submission. Override anything the model gets wrong — corrections are what future retraining learns from.
             </p>
@@ -124,12 +124,12 @@ export default function DashboardPage() {
           </div>
         )}
 
-        <div className="flex items-center gap-3 mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-6">
           <div className="flex items-center gap-2 px-3 py-2 bg-panel/50 rounded-lg border border-line/50">
             <Filter className="w-4 h-4 text-paper/50" />
             <span className="font-mono text-xs text-paper/50 uppercase tracking-wider">Filters</span>
           </div>
-          <div className="flex-1 max-w-md">
+          <div className="flex-1 max-w-md w-full">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-paper/30" />
               <input
@@ -207,20 +207,20 @@ export default function DashboardPage() {
               <div 
                 key={bug.id} 
                 onClick={() => router.push(`/bug/${bug.id}`)}
-                className="p-5 border-b border-line/50 last:border-b-0 bg-panel/20 hover:bg-panel/40 transition-all duration-200 hover:shadow-md animate-fade-in-up cursor-pointer group"
+                className="p-4 sm:p-5 border-b border-line/50 last:border-b-0 bg-panel/20 hover:bg-panel/40 transition-all duration-200 hover:shadow-md animate-fade-in-up cursor-pointer group"
                 style={{ animationDelay: `${index * 50}ms` }}
               >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2 mb-1.5">
+                <div className="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-4">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2 mb-1.5">
                       <span className="font-mono text-xs text-paper/30">#{bug.id}</span>
                       <SeverityBadge severity={bug.final_severity || bug.predicted_severity} />
                       <TeamBadge team={bug.final_team || bug.predicted_team} />
                       <StatusBadge status={bug.status} />
                     </div>
-                    <h3 className="font-medium text-paper truncate">{bug.title}</h3>
-                    <p className="text-paper/50 text-sm mt-0.5 line-clamp-1">{bug.description}</p>
-                    <p className="font-mono text-[11px] text-paper/30 mt-2 flex items-center gap-3">
+                    <h3 className="font-medium text-paper truncate text-sm sm:text-base">{bug.title}</h3>
+                    <p className="text-paper/50 text-sm mt-0.5 line-clamp-1 text-xs sm:text-sm">{bug.description}</p>
+                    <p className="font-mono text-[10px] sm:text-[11px] text-paper/30 mt-2 flex items-center gap-2 sm:gap-3 flex-wrap">
                       <span className="flex items-center gap-1.5">
                         <Brain className="w-3 h-3 text-accent" />
                         AI confidence: severity {bug.severity_confidence}% · team {bug.team_confidence}%
@@ -228,7 +228,7 @@ export default function DashboardPage() {
                       {bug.reporter ? `· reported by ${bug.reporter}` : ""}
                     </p>
                   </div>
-                  <div className="flex gap-1.5 shrink-0 items-center">
+                  <div className="flex gap-1.5 shrink-0 items-center sm:flex-row flex-col">
                     {(bug.status === "new" || bug.status === "triaged") && (
                       <ActionButton onClick={(e: React.MouseEvent) => { e.stopPropagation(); setBugStatus(bug.id, "assigned" as Status); }}>Assign</ActionButton>
                     )}
@@ -244,7 +244,7 @@ export default function DashboardPage() {
                     {bug.status === "closed" && (
                       <ActionButton onClick={(e: React.MouseEvent) => { e.stopPropagation(); setBugStatus(bug.id, "reopened" as Status); }}>Reopen</ActionButton>
                     )}
-                    <ChevronRight className="w-5 h-5 text-paper/30 group-hover:text-accent transition-colors" />
+                    <ChevronRight className="w-5 h-5 text-paper/30 group-hover:text-accent transition-colors hidden sm:block" />
                   </div>
                 </div>
               </div>
@@ -259,7 +259,7 @@ export default function DashboardPage() {
             <TrendingUp className="w-5 h-5 text-accent" />
             <h2 className="font-mono text-xl font-bold tracking-tight text-white">Analytics</h2>
           </div>
-          <div className="grid md:grid-cols-3 gap-6 mb-8">
+          <div className="grid md:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
             <ChartCard title="By severity"><SeverityBreakdown data={summary.by_severity} /></ChartCard>
             <ChartCard title="By team"><TeamLoadChart data={summary.by_team} /></ChartCard>
             <ChartCard title="Reports / day (30d)"><TrendChart data={trend} /></ChartCard>

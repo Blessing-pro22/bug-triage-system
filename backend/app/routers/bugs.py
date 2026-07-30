@@ -87,3 +87,31 @@ def delete_bug(bug_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Bug not found")
     db.delete(bug)
     db.commit()
+
+
+@router.post("/{bug_id}/feedback", response_model=schemas.FeedbackOut)
+def submit_feedback(bug_id: int, payload: schemas.FeedbackCreate, db: Session = Depends(get_db)):
+    """Submit human correction feedback for AI classification."""
+    bug = db.query(models.Bug).filter(models.Bug.id == bug_id).first()
+    if not bug:
+        raise HTTPException(status_code=404, detail="Bug not found")
+    
+    # Update bug with corrections
+    if payload.corrected_severity:
+        bug.final_severity = payload.corrected_severity
+    if payload.corrected_team:
+        bug.final_team = payload.corrected_team
+    
+    db.commit()
+    db.refresh(bug)
+    
+    # Return feedback record
+    return {
+        "id": bug_id,  # Using bug_id as feedback_id for simplicity
+        "bug_id": bug_id,
+        "original_severity": bug.predicted_severity.value,
+        "original_team": bug.predicted_team.value,
+        "corrected_severity": bug.final_severity.value if bug.final_severity else None,
+        "corrected_team": bug.final_team.value if bug.final_team else None,
+        "created_at": bug.created_at.isoformat(),
+    }

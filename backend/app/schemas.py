@@ -43,3 +43,18 @@ class AnalyticsSummary(BaseModel):
     by_severity: dict
     by_team: dict
     by_status: dict
+
+
+class FeedbackCreate(BaseModel):
+    corrected_severity: Optional[Severity] = None
+    corrected_team: Optional[Team] = None
+
+
+class FeedbackOut(BaseModel):
+    id: int
+    bug_id: int
+    original_severity: str
+    original_team: str
+    corrected_severity: Optional[str]
+    corrected_team: Optional[str]
+    created_at: str
