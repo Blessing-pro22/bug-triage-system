@@ -105,11 +105,10 @@
 
 import os
 import joblib
+import pandas as pd
 
-# Locate current directory
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Define candidate locations where the model might sit on local vs Render
 POSSIBLE_SEVERITY_PATHS = [
     os.path.join(BASE_DIR, "models", "severity_model_gitbugs.joblib"),
     os.path.join(os.getcwd(), "backend", "app", "ml", "models", "severity_model_gitbugs.joblib"),
@@ -125,7 +124,6 @@ POSSIBLE_TEAM_PATHS = [
 severity_model = None
 team_model = None
 
-# Find and load severity model
 for path in POSSIBLE_SEVERITY_PATHS:
     if os.path.exists(path):
         try:
@@ -135,10 +133,6 @@ for path in POSSIBLE_SEVERITY_PATHS:
         except Exception as e:
             print(f"⚠️ Error loading severity model at {path}: {e}")
 
-if severity_model is None:
-    print(f"❌ CRITICAL: Severity model NOT found in any searched paths: {POSSIBLE_SEVERITY_PATHS}")
-
-# Find and load team model
 for path in POSSIBLE_TEAM_PATHS:
     if os.path.exists(path):
         try:
@@ -148,5 +142,66 @@ for path in POSSIBLE_TEAM_PATHS:
         except Exception as e:
             print(f"⚠️ Error loading team model at {path}: {e}")
 
-if team_model is None:
-    print(f"❌ CRITICAL: Team model NOT found in any searched paths: {POSSIBLE_TEAM_PATHS}")
+
+def predict(title: str, description: str) -> dict:
+    title_str = title or ""
+    desc_str = description or ""
+    full_text = f"{title_str} {desc_str}".strip()
+
+    predicted_severity = "major"
+    severity_confidence = 0.50
+    predicted_team = "backend"
+    team_confidence = 0.50
+
+    if not full_text:
+        return {
+            "severity": predicted_severity,
+            "severity_confidence": severity_confidence,
+            "team": predicted_team,
+            "team_confidence": team_confidence,
+        }
+
+    # --- Severity Model Execution ---
+    if severity_model is not None:
+        try:
+            # Try plain text list first
+            try:
+                preds = severity_model.predict([full_text])
+                if hasattr(severity_model, "predict_proba"):
+                    probs = severity_model.predict_proba([full_text])[0]
+                    severity_confidence = float(max(probs))
+                else:
+                    severity_confidence = 0.85
+            except Exception:
+                # Fallback to DataFrame if pipeline expects named columns (e.g. title/description)
+                df_input = pd.DataFrame([{"title": title_str, "description": desc_str, "text": full_text}])
+                preds = severity_model.predict(df_input)
+                if hasattr(severity_model, "predict_proba"):
+                    probs = severity_model.predict_proba(df_input)[0]
+                    severity_confidence = float(max(probs))
+                else:
+                    severity_confidence = 0.85
+
+            predicted_severity = preds[0]
+        except Exception as e:
+            print(f"❌ Severity prediction failed at runtime: {e}")
+
+    # --- Team Model Execution ---
+    if team_model is not None:
+        try:
+            preds = team_model.predict([full_text])
+            if hasattr(team_model, "predict_proba"):
+                probs = team_model.predict_proba([full_text])[0]
+                team_confidence = float(max(probs))
+            else:
+                team_confidence = 0.85
+            predicted_team = preds[0]
+        except Exception as e:
+            print(f"❌ Team prediction failed at runtime: {e}")
+
+    return {
+        "severity": str(predicted_severity).lower(),
+        "severity_confidence": round(severity_confidence, 2),
+        "team": str(predicted_team).lower(),
+        "team_confidence": round(team_confidence, 2),
+    }
