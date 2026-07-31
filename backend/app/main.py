@@ -13,13 +13,21 @@ app = FastAPI(
     version="1.0.0",
 )
 
+# Enable CORS for all origins during development/demo
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # tighten to the deployed frontend origin in production
+    allow_origins=["*"],  # Allows requests from any frontend domain
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"],  # Allows GET, POST, OPTIONS, PATCH, DELETE, etc.
+    allow_headers=["*"],  # Allows all headers
 )
+# Explicitly declare allowed origins including your Vercel app
+origins = [
+    "https://bug-triage-system-eight.vercel.app",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "*"
+]
 
 app.include_router(bugs.router)
 app.include_router(analytics.router)
