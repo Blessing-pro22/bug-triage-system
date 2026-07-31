@@ -28,3 +28,5 @@ app.include_router(analytics.router)
 @app.get("/")
 def health_check():
     return {"status": "ok", "service": "bug-triage-api"}
+# Make sure your API loads the new model filename
+MODEL_PATH = "app/ml/models/severity_model_gitbugs.joblib"
