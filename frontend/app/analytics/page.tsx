@@ -70,6 +70,47 @@ export default function AnalyticsPage() {
     );
   }
 
+  // Handle case where there are no predictions (all zeros)
+  if (performance.total_predictions === 0) {
+    return (
+      <div className="animate-fade-in">
+        <div className="mb-10">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-3 bg-accent/20 rounded-xl">
+              <Brain className="w-6 h-6 text-accent" />
+            </div>
+            <div>
+              <h1 className="font-mono text-3xl font-bold tracking-tight text-white">AI Model Performance</h1>
+              <p className="text-paper/50 text-sm">Track how well the AI classification system is performing</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="relative overflow-hidden rounded-2xl p-8 bg-gradient-to-br from-panel/50 to-panel/30 border border-line/50 backdrop-blur-sm shadow-xl">
+          <div className="relative text-center">
+            <div className="inline-flex flex-col items-center gap-4 mb-6">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-accent/20 to-accent/5 flex items-center justify-center border border-accent/30">
+                <Brain className="w-10 h-10 text-accent" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-lg text-white mb-2">No data available yet</h3>
+                <p className="text-paper/50 text-sm max-w-md">
+                  Submit some bug reports to start tracking AI performance metrics. The system needs data to calculate accuracy, precision, recall, and F1 score.
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => window.location.href = '/submit'}
+              className="inline-flex items-center justify-center gap-2 font-mono text-xs uppercase tracking-wider px-6 py-3 rounded-xl bg-gradient-to-r from-accent to-accent/80 text-ink hover:from-accent/90 hover:to-accent/70 transition-all duration-200 shadow-lg hover:shadow-xl"
+            >
+              Submit First Bug Report
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const metrics = [
     {
       label: "Classification Accuracy",
