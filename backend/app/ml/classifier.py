@@ -108,39 +108,31 @@ import joblib
 import pandas as pd
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
-POSSIBLE_SEVERITY_PATHS = [
-    os.path.join(BASE_DIR, "models", "severity_model_gitbugs.joblib"),
-    os.path.join(os.getcwd(), "backend", "app", "ml", "models", "severity_model_gitbugs.joblib"),
-    os.path.join(os.getcwd(), "app", "ml", "models", "severity_model_gitbugs.joblib"),
-]
-
-POSSIBLE_TEAM_PATHS = [
-    os.path.join(BASE_DIR, "models", "team_model.joblib"),
-    os.path.join(os.getcwd(), "backend", "app", "ml", "models", "team_model.joblib"),
-    os.path.join(os.getcwd(), "app", "ml", "models", "team_model.joblib"),
-]
+SEVERITY_MODEL_PATH = os.path.join(BASE_DIR, "models", "severity_model_gitbugs.joblib")
+TEAM_MODEL_PATH = os.path.join(BASE_DIR, "models", "team_model.joblib")
 
 severity_model = None
 team_model = None
 
-for path in POSSIBLE_SEVERITY_PATHS:
-    if os.path.exists(path):
-        try:
-            severity_model = joblib.load(path)
-            print(f"✅ SUCCESS: Loaded severity model from {path}")
-            break
-        except Exception as e:
-            print(f"⚠️ Error loading severity model at {path}: {e}")
+# Load Severity Model
+if os.path.exists(SEVERITY_MODEL_PATH):
+    try:
+        severity_model = joblib.load(SEVERITY_MODEL_PATH)
+        print(f"✅ Successfully loaded severity model from {SEVERITY_MODEL_PATH}")
+    except Exception as e:
+        print(f"❌ Failed to load severity model: {e}")
+else:
+    print(f"⚠️ Severity model not found at {SEVERITY_MODEL_PATH}")
 
-for path in POSSIBLE_TEAM_PATHS:
-    if os.path.exists(path):
-        try:
-            team_model = joblib.load(path)
-            print(f"✅ SUCCESS: Loaded team model from {path}")
-            break
-        except Exception as e:
-            print(f"⚠️ Error loading team model at {path}: {e}")
+# Load Team Model
+if os.path.exists(TEAM_MODEL_PATH):
+    try:
+        team_model = joblib.load(TEAM_MODEL_PATH)
+        print(f"✅ Successfully loaded team model from {TEAM_MODEL_PATH}")
+    except Exception as e:
+        print(f"❌ Failed to load team model: {e}")
+else:
+    print(f"⚠️ Team model not found at {TEAM_MODEL_PATH}")
 
 
 def predict(title: str, description: str) -> dict:
@@ -161,32 +153,32 @@ def predict(title: str, description: str) -> dict:
             "team_confidence": team_confidence,
         }
 
-    # --- Severity Model Execution ---
+    # Execute Severity Prediction
     if severity_model is not None:
         try:
-            # Try plain text list first
+            # Try passing as list of strings
             try:
                 preds = severity_model.predict([full_text])
                 if hasattr(severity_model, "predict_proba"):
                     probs = severity_model.predict_proba([full_text])[0]
                     severity_confidence = float(max(probs))
                 else:
-                    severity_confidence = 0.85
-            except Exception:
-                # Fallback to DataFrame if pipeline expects named columns (e.g. title/description)
+                    severity_confidence = 0.88
+                predicted_severity = preds[0]
+            except Exception as inner_e:
+                # If list fails, try DataFrame format (some pipelines expect named columns)
                 df_input = pd.DataFrame([{"title": title_str, "description": desc_str, "text": full_text}])
                 preds = severity_model.predict(df_input)
                 if hasattr(severity_model, "predict_proba"):
                     probs = severity_model.predict_proba(df_input)[0]
                     severity_confidence = float(max(probs))
                 else:
-                    severity_confidence = 0.85
-
-            predicted_severity = preds[0]
+                    severity_confidence = 0.88
+                predicted_severity = preds[0]
         except Exception as e:
-            print(f"❌ Severity prediction failed at runtime: {e}")
+            print(f"❌ Error during severity model .predict(): {e}")
 
-    # --- Team Model Execution ---
+    # Execute Team Prediction
     if team_model is not None:
         try:
             preds = team_model.predict([full_text])
@@ -194,14 +186,14 @@ def predict(title: str, description: str) -> dict:
                 probs = team_model.predict_proba([full_text])[0]
                 team_confidence = float(max(probs))
             else:
-                team_confidence = 0.85
+                team_confidence = 0.80
             predicted_team = preds[0]
         except Exception as e:
-            print(f"❌ Team prediction failed at runtime: {e}")
+            print(f"❌ Error during team model .predict(): {e}")
 
     return {
         "severity": str(predicted_severity).lower(),
-        "severity_confidence": round(severity_confidence, 2),
+        "severity_confidence": round(float(severity_confidence), 2),
         "team": str(predicted_team).lower(),
-        "team_confidence": round(team_confidence, 2),
+        "team_confidence": round(float(team_confidence), 2),
     }
