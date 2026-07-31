@@ -115,8 +115,9 @@ export default function BugDetailPage() {
     );
   }
 
-  const confidenceLevel = bug.severity_confidence && bug.severity_confidence >= 80 ? "High" : 
-                          bug.severity_confidence && bug.severity_confidence >= 60 ? "Medium" : "Low";
+  const confidencePercentage = bug.severity_confidence ? Math.round(bug.severity_confidence * 100) : 0;
+  const confidenceLevel = confidencePercentage >= 80 ? "High" : 
+                          confidencePercentage >= 60 ? "Medium" : "Low";
 
   return (
     <div className="max-w-4xl mx-auto animate-fade-in">
@@ -207,12 +208,12 @@ export default function BugDetailPage() {
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-paper/60 text-sm font-mono uppercase tracking-wider">Severity Confidence</span>
-                  <span className="text-accent font-bold">{bug.severity_confidence}%</span>
+                  <span className="text-accent font-bold">{confidencePercentage}%</span>
                 </div>
                 <div className="h-2 bg-panel/50 rounded-full overflow-hidden">
                   <div 
                     className="h-full bg-gradient-to-r from-accent to-accent/70 transition-all duration-500"
-                    style={{ width: `${bug.severity_confidence}%` }}
+                    style={{ width: `${confidencePercentage}%` }}
                   />
                 </div>
                 <div className="mt-2 flex items-center gap-2">

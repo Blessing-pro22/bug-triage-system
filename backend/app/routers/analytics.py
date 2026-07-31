@@ -13,7 +13,7 @@ router = APIRouter(prefix="/api/analytics", tags=["analytics"])
 def summary(db: Session = Depends(get_db)):
     bugs = db.query(models.Bug).all()
     total = len(bugs)
-    open_count = sum(1 for b in bugs if b.status in (models.Status.open, models.Status.in_progress))
+    open_count = sum(1 for b in bugs if b.status in (models.Status.new, models.Status.triaged, models.Status.assigned, models.Status.in_progress, models.Status.reopened))
     resolved = [b for b in bugs if b.resolved_at is not None]
 
     avg_hours = None

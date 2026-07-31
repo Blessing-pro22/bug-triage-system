@@ -56,7 +56,7 @@ export default function SubmitPage() {
               <TeamBadge team={result.predicted_team} />
             </div>
             <p className="font-mono text-xs text-paper/40 mb-8">
-              confidence: severity {result.severity_confidence}% · team {result.team_confidence}%
+              confidence: severity {Math.round((result.severity_confidence || 0) * 100)}% · team {Math.round((result.team_confidence || 0) * 100)}%
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-3">
               <button

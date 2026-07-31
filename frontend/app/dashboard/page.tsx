@@ -223,7 +223,7 @@ export default function DashboardPage() {
                     <p className="font-mono text-[10px] sm:text-[11px] text-paper/30 mt-2 flex items-center gap-2 sm:gap-3 flex-wrap">
                       <span className="flex items-center gap-1.5">
                         <Brain className="w-3 h-3 text-accent" />
-                        AI confidence: severity {bug.severity_confidence}% · team {bug.team_confidence}%
+                        AI confidence: severity {Math.round((bug.severity_confidence || 0) * 100)}% · team {Math.round((bug.team_confidence || 0) * 100)}%
                       </span>
                       {bug.reporter ? `· reported by ${bug.reporter}` : ""}
                     </p>

@@ -18,10 +18,13 @@ class Team(str, enum.Enum):
 
 
 class Status(str, enum.Enum):
-    open = "open"
+    new = "new"
+    triaged = "triaged"
+    assigned = "assigned"
     in_progress = "in_progress"
     resolved = "resolved"
     closed = "closed"
+    reopened = "reopened"
 
 
 class Bug(Base):
@@ -42,7 +45,7 @@ class Bug(Base):
     final_severity = Column(Enum(Severity), nullable=True)
     final_team = Column(Enum(Team), nullable=True)
 
-    status = Column(Enum(Status), default=Status.open, nullable=False)
+    status = Column(Enum(Status), default=Status.new, nullable=False)
 
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     resolved_at = Column(DateTime, nullable=True)
