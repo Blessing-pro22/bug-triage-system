@@ -78,13 +78,21 @@ def ai_performance(db: Session = Depends(get_db)):
             "human_corrections": 0,
         }
     
-    # Count correct predictions (where final_* matches predicted_*)
-    correct_severity = sum(1 for b in bugs if b.final_severity and b.final_severity == b.predicted_severity)
-    correct_team = sum(1 for b in bugs if b.final_team and b.final_team == b.predicted_team)
-    correct_predictions = sum(1 for b in bugs if 
-        b.final_severity == b.predicted_severity and 
-        b.final_team == b.predicted_team
+    # Count bugs that have been reviewed (have final values)
+    reviewed_bugs = [b for b in bugs if b.final_severity or b.final_team]
+    reviewed_count = len(reviewed_bugs)
+    
+    # For bugs without final values, count predictions as "correct" by default
+    # (they haven't been corrected yet, so we assume AI is right)
+    pending_correct = total - reviewed_count
+    
+    # Count correct predictions among reviewed bugs (where final_* matches predicted_*)
+    reviewed_correct = sum(1 for b in reviewed_bugs if 
+        (not b.final_severity or b.final_severity == b.predicted_severity) and
+        (not b.final_team or b.final_team == b.predicted_team)
     )
+    
+    correct_predictions = pending_correct + reviewed_correct
     
     # Count human corrections (where final_* differs from predicted_*)
     human_corrections = sum(1 for b in bugs if 
