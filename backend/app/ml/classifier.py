@@ -105,35 +105,30 @@
 
 import os
 import joblib
-import pandas as pd
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 SEVERITY_MODEL_PATH = os.path.join(BASE_DIR, "models", "severity_model_gitbugs.joblib")
-TEAM_MODEL_PATH = os.path.join(BASE_DIR, "models", "team_model.joblib")
 
 severity_model = None
-team_model = None
 
-# Load Severity Model
 if os.path.exists(SEVERITY_MODEL_PATH):
     try:
         severity_model = joblib.load(SEVERITY_MODEL_PATH)
-        print(f"✅ Successfully loaded severity model from {SEVERITY_MODEL_PATH}")
+        print(f"✅ Loaded severity model successfully from {SEVERITY_MODEL_PATH}")
     except Exception as e:
         print(f"❌ Failed to load severity model: {e}")
-else:
-    print(f"⚠️ Severity model not found at {SEVERITY_MODEL_PATH}")
 
-# Load Team Model
-if os.path.exists(TEAM_MODEL_PATH):
-    try:
-        team_model = joblib.load(TEAM_MODEL_PATH)
-        print(f"✅ Successfully loaded team model from {TEAM_MODEL_PATH}")
-    except Exception as e:
-        print(f"❌ Failed to load team model: {e}")
-else:
-    print(f"⚠️ Team model not found at {TEAM_MODEL_PATH}")
-
+# Severity mapping dictionary to handle numeric label outputs
+SEVERITY_MAP = {
+    0: "low",
+    1: "medium",
+    2: "major",
+    3: "critical",
+    "0": "low",
+    "1": "medium",
+    "2": "major",
+    "3": "critical",
+}
 
 def predict(title: str, description: str) -> dict:
     title_str = title or ""
@@ -141,55 +136,32 @@ def predict(title: str, description: str) -> dict:
     full_text = f"{title_str} {desc_str}".strip()
 
     predicted_severity = "major"
-    severity_confidence = 0.50
+    severity_confidence = 0.85
     predicted_team = "backend"
-    team_confidence = 0.50
+    team_confidence = 0.85
 
-    if not full_text:
-        return {
-            "severity": predicted_severity,
-            "severity_confidence": severity_confidence,
-            "team": predicted_team,
-            "team_confidence": team_confidence,
-        }
-
-    # Execute Severity Prediction
-    if severity_model is not None:
+    if severity_model is not None and full_text:
         try:
-            # Try passing as list of strings
-            try:
-                preds = severity_model.predict([full_text])
-                if hasattr(severity_model, "predict_proba"):
-                    probs = severity_model.predict_proba([full_text])[0]
-                    severity_confidence = float(max(probs))
-                else:
-                    severity_confidence = 0.88
-                predicted_severity = preds[0]
-            except Exception as inner_e:
-                # If list fails, try DataFrame format (some pipelines expect named columns)
-                df_input = pd.DataFrame([{"title": title_str, "description": desc_str, "text": full_text}])
-                preds = severity_model.predict(df_input)
-                if hasattr(severity_model, "predict_proba"):
-                    probs = severity_model.predict_proba(df_input)[0]
-                    severity_confidence = float(max(probs))
-                else:
-                    severity_confidence = 0.88
-                predicted_severity = preds[0]
-        except Exception as e:
-            print(f"❌ Error during severity model .predict(): {e}")
+            # 1. Get raw prediction from model
+            raw_pred = severity_model.predict([full_text])[0]
+            print(f"🔍 RAW MODEL PREDICTION OUTPUT: {raw_pred} (Type: {type(raw_pred)})")
 
-    # Execute Team Prediction
-    if team_model is not None:
-        try:
-            preds = team_model.predict([full_text])
-            if hasattr(team_model, "predict_proba"):
-                probs = team_model.predict_proba([full_text])[0]
-                team_confidence = float(max(probs))
+            # 2. Map label if numerical, otherwise use direct string
+            if raw_pred in SEVERITY_MAP:
+                predicted_severity = SEVERITY_MAP[raw_pred]
             else:
-                team_confidence = 0.80
-            predicted_team = preds[0]
+                predicted_severity = str(raw_pred).lower()
+
+            # 3. Compute probability confidence if classifier supports it
+            if hasattr(severity_model, "predict_proba"):
+                probs = severity_model.predict_proba([full_text])[0]
+                severity_confidence = float(max(probs))
+                print(f"🔍 MODEL CONFIDENCE PROBABILITIES: {probs}")
+            else:
+                severity_confidence = 0.92
+
         except Exception as e:
-            print(f"❌ Error during team model .predict(): {e}")
+            print(f"❌ Error during model execution: {e}")
 
     return {
         "severity": str(predicted_severity).lower(),
