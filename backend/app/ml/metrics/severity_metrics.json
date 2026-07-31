@@ -1,0 +1,86 @@
+{
+  "model": "GitBugs severity classifier",
+  "dataset": "GitBugs",
+  "label_source": "Priority mapped to severity using documented proxy mapping",
+  "rows_total": 95271,
+  "rows_train": 76216,
+  "rows_test": 19055,
+  "accuracy": 0.749987,
+  "precision_macro": 0.6743,
+  "recall_macro": 0.679974,
+  "f1_macro": 0.676694,
+  "precision_weighted": 0.756608,
+  "recall_weighted": 0.749987,
+  "f1_weighted": 0.753056,
+  "labels": [
+    "critical",
+    "major",
+    "minor",
+    "trivial"
+  ],
+  "classification_report": {
+    "critical": {
+      "precision": 0.3951979234263465,
+      "recall": 0.4422657952069717,
+      "f1-score": 0.4174091843728581,
+      "support": 1377.0
+    },
+    "major": {
+      "precision": 0.7323988531379421,
+      "recall": 0.7267267267267268,
+      "f1-score": 0.7295517651725506,
+      "support": 6327.0
+    },
+    "minor": {
+      "precision": 0.610047354333951,
+      "recall": 0.626559526326919,
+      "f1-score": 0.6181931984143543,
+      "support": 4729.0
+    },
+    "trivial": {
+      "precision": 0.9595547891519047,
+      "recall": 0.9243430987617034,
+      "f1-score": 0.9416198753942004,
+      "support": 6622.0
+    },
+    "accuracy": 0.7499868800839674,
+    "macro avg": {
+      "precision": 0.674299730012536,
+      "recall": 0.6799737867555802,
+      "f1-score": 0.6766935058384909,
+      "support": 19055.0
+    },
+    "weighted avg": {
+      "precision": 0.7566077584240885,
+      "recall": 0.7499868800839674,
+      "f1-score": 0.7530563587137249,
+      "support": 19055.0
+    }
+  },
+  "confusion_matrix": [
+    [
+      609,
+      357,
+      367,
+      44
+    ],
+    [
+      454,
+      4598,
+      1209,
+      66
+    ],
+    [
+      433,
+      1185,
+      2963,
+      148
+    ],
+    [
+      45,
+      138,
+      318,
+      6121
+    ]
+  ]
+}

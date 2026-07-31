@@ -3,3 +3,10 @@ __pycache__/
 *.db
 *.joblib
 .env
+
+# Ignore all CSV datasets in the data folder and subfolders
+**/app/ml/data/**/*.csv
+**/app/ml/data/
+
+# Ignore model binaries
+**/app/ml/models/*.joblib
