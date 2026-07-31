@@ -31,6 +31,12 @@ def submit_bug(payload: schemas.BugCreate, db: Session = Depends(get_db)):
     db.refresh(bug)
     return bug
 
+router = APIRouter(prefix="/api/bugs", tags=["Bugs"])
+
+@router.get("", response_model=List[schemas.BugOut]) 
+# Handles GET /api/bugs
+def get_bugs(db: Session = Depends(get_db)):
+    return db.query(models.Bug).order_by(models.Bug.created_at.desc()).all()
 
 @router.get("", response_model=list[schemas.BugOut])
 def list_bugs(
@@ -116,7 +122,7 @@ def submit_feedback(bug_id: int, payload: schemas.FeedbackCreate, db: Session = 
         "created_at": bug.created_at.isoformat(),
     }
 
-    
+
 @router.get("/activity")
 def get_recent_activity(db: Session = Depends(get_db)):
     """Returns recent bug submissions for the dashboard activity feed."""

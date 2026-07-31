@@ -18,6 +18,7 @@ class Team(str, enum.Enum):
 
 
 class Status(str, enum.Enum):
+    open = "open"
     new = "new"
     triaged = "triaged"
     assigned = "assigned"
