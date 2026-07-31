@@ -115,3 +115,19 @@ def submit_feedback(bug_id: int, payload: schemas.FeedbackCreate, db: Session = 
         "corrected_team": bug.final_team.value if bug.final_team else None,
         "created_at": bug.created_at.isoformat(),
     }
+
+    
+@router.get("/activity")
+def get_recent_activity(db: Session = Depends(get_db)):
+    """Returns recent bug submissions for the dashboard activity feed."""
+    try:
+        recent_bugs = (
+            db.query(models.Bug)
+            .order_by(models.Bug.created_at.desc())
+            .limit(10)
+            .all()
+        )
+        return recent_bugs
+    except Exception as e:
+        print(f"Error fetching activity feed: {e}")
+        return []

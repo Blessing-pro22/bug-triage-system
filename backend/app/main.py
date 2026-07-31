@@ -105,3 +105,11 @@ def debug_files():
         "ml_models_dir_exists": os.path.exists(ml_models_dir),
         "files_found": files_in_models
     }
+    
+    app.include_router(bugs.router, prefix="/api/bugs", tags=["Bugs"])
+app.include_router(analytics.router, prefix="/api/analytics", tags=["Analytics"])
+
+# Fallback endpoint if dashboard calls /api/activity directly
+@app.get("/api/activity")
+def get_activity_fallback(db: Session = Depends(get_db)):
+    return db.query(models.Bug).order_by(models.Bug.id.desc()).limit(10).all()
