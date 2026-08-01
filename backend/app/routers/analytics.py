@@ -19,10 +19,31 @@ def summary(db: Session = Depends(get_db)):
     open_count = sum(1 for b in bugs if str(b.status).lower() in open_statuses)
     closed_count = sum(1 for b in bugs if str(b.status).lower() in {"resolved", "closed"})
     
+    # Distribution by severity (priority)
+    by_severity = {}
+    for b in bugs:
+        severity = str(b.final_severity or b.predicted_severity).lower()
+        by_severity[severity] = by_severity.get(severity, 0) + 1
+    
+    # Distribution by team (category)
+    by_team = {}
+    for b in bugs:
+        team = str(b.final_team or b.predicted_team).lower()
+        by_team[team] = by_team.get(team, 0) + 1
+    
+    # Distribution by status
+    by_status = {}
+    for b in bugs:
+        status = str(b.status).lower()
+        by_status[status] = by_status.get(status, 0) + 1
+    
     return {
         "total_bugs": len(bugs),
         "open_bugs": open_count,
         "closed_bugs": closed_count,
+        "by_severity": by_severity,
+        "by_team": by_team,
+        "by_status": by_status,
     }
 
 # @router.get("/summary", response_model=schemas.AnalyticsSummary)

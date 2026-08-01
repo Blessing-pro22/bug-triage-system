@@ -15,3 +15,7 @@ psycopg2-binary
 scikit-learn>=1.5.2
 pandas
 joblib
+python-multipart
+passlib[bcrypt]
+python-jose[cryptography]
+pydantic[email]

@@ -68,6 +68,71 @@ def create_bug(bug_in: schemas.BugCreate, db: Session = Depends(get_db)):
         )
 
 
+@router.get("/{bug_id}/similar")
+def find_similar_bugs(bug_id: int, db: Session = Depends(get_db)):
+    """Find similar historical bugs for a given bug ID."""
+    bug = db.query(models.Bug).filter(models.Bug.id == bug_id).first()
+    if not bug:
+        raise HTTPException(status_code=404, detail="Bug not found")
+    
+    # Get historical bugs (excluding current bug)
+    historical_bugs = db.query(models.Bug).filter(models.Bug.id != bug_id).order_by(models.Bug.created_at.desc()).limit(50).all()
+    
+    # Convert to dict format for similarity search
+    historical_bugs_dict = [
+        {
+            'id': b.id,
+            'title': b.title,
+            'description': b.description,
+            'predicted_severity': b.predicted_severity,
+            'predicted_team': b.predicted_team,
+            'status': b.status
+        }
+        for b in historical_bugs
+    ]
+    
+    # Find similar bugs
+    similar_bugs = ml.find_similar_bugs(bug.title, bug.description, historical_bugs_dict, top_k=5)
+    
+    # Format response
+    return {
+        'current_bug': {
+            'id': bug.id,
+            'title': bug.title,
+            'predicted_severity': bug.predicted_severity,
+            'predicted_team': bug.predicted_team
+        },
+        'similar_bugs': [
+            {
+                'bug': bug_dict,
+                'similarity_score': round(score * 100, 2)
+            }
+            for bug_dict, score in similar_bugs
+        ]
+    }
+
+
+@router.get("/{bug_id}/explanation")
+def get_prediction_explanation(bug_id: int, db: Session = Depends(get_db)):
+    """Get explanation for ML predictions for a given bug."""
+    bug = db.query(models.Bug).filter(models.Bug.id == bug_id).first()
+    if not bug:
+        raise HTTPException(status_code=404, detail="Bug not found")
+    
+    explanation = ml.get_prediction_explanation(
+        bug.title,
+        bug.description,
+        bug.predicted_severity,
+        bug.predicted_team
+    )
+    
+    return {
+        'bug_id': bug.id,
+        'title': bug.title,
+        'explanation': explanation
+    }
+
+
 @router.patch("/{bug_id}", response_model=schemas.BugOut)
 @router.put("/{bug_id}", response_model=schemas.BugOut)
 def update_bug(bug_id: int, bug_update: schemas.BugUpdate, db: Session = Depends(get_db)):

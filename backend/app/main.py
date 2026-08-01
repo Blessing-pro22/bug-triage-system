@@ -1,14 +1,15 @@
 import os
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from .routers import bugs, analytics
+from .routers import bugs, analytics, batch, auth
 
 from sqlalchemy.orm import Session
 
 from .database import Base, engine, get_db
-from . import models
+from . import models, auth_models
 
 Base.metadata.create_all(bind=engine)
+auth_models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="Automated Bug Triage System API",
@@ -28,6 +29,8 @@ app.add_middleware(
 
 app.include_router(bugs.router)
 app.include_router(analytics.router)
+app.include_router(batch.router)
+app.include_router(auth.router)
 
 @app.api_route("/", methods=["GET", "HEAD"])
 def root():
