@@ -21,8 +21,21 @@ const tooltipStyle = {
   color: "#E7ECF0",
 };
 
-export function SeverityBreakdown({ data }: { data: AnalyticsSummary["by_severity"] }) {
-  const chartData = Object.entries(data).map(([name, value]) => ({ name, value }));
+export function SeverityBreakdown({ data }: { data?: AnalyticsSummary["by_severity"] | null }) {
+  const safeData = data || {};
+  const chartData = Object.entries(safeData).map(([name, value]) => ({
+    name: (name || "unknown").toLowerCase(),
+    value: Number(value) || 0,
+  }));
+
+  if (chartData.length === 0) {
+    return (
+      <div className="h-[220px] flex items-center justify-center font-mono text-xs text-paper/30">
+        No severity data
+      </div>
+    );
+  }
+
   return (
     <ResponsiveContainer width="100%" height={220}>
       <PieChart>
@@ -35,8 +48,11 @@ export function SeverityBreakdown({ data }: { data: AnalyticsSummary["by_severit
           paddingAngle={3}
           stroke="none"
         >
-          {chartData.map((entry) => (
-            <Cell key={entry.name} fill={SEVERITY_COLORS[entry.name] || "#5B6672"} />
+          {chartData.map((entry, index) => (
+            <Cell 
+              key={entry.name || index} 
+              fill={SEVERITY_COLORS[entry.name] || "#5B6672"} 
+            />
           ))}
         </Pie>
         <Tooltip contentStyle={tooltipStyle} />
@@ -45,8 +61,21 @@ export function SeverityBreakdown({ data }: { data: AnalyticsSummary["by_severit
   );
 }
 
-export function TeamLoadChart({ data }: { data: AnalyticsSummary["by_team"] }) {
-  const chartData = Object.entries(data).map(([name, count]) => ({ name, count }));
+export function TeamLoadChart({ data }: { data?: AnalyticsSummary["by_team"] | null }) {
+  const safeData = data || {};
+  const chartData = Object.entries(safeData).map(([name, count]) => ({
+    name: (name || "unknown").toLowerCase(),
+    count: Number(count) || 0,
+  }));
+
+  if (chartData.length === 0) {
+    return (
+      <div className="h-[220px] flex items-center justify-center font-mono text-xs text-paper/30">
+        No team data
+      </div>
+    );
+  }
+
   return (
     <ResponsiveContainer width="100%" height={220}>
       <BarChart data={chartData}>
@@ -60,10 +89,20 @@ export function TeamLoadChart({ data }: { data: AnalyticsSummary["by_team"] }) {
   );
 }
 
-export function TrendChart({ data }: { data: TrendPoint[] }) {
+export function TrendChart({ data }: { data?: TrendPoint[] | null }) {
+  const safeData = Array.isArray(data) ? data : [];
+
+  if (safeData.length === 0) {
+    return (
+      <div className="h-[220px] flex items-center justify-center font-mono text-xs text-paper/30">
+        No trend data
+      </div>
+    );
+  }
+
   return (
     <ResponsiveContainer width="100%" height={220}>
-      <LineChart data={data}>
+      <LineChart data={safeData}>
         <CartesianGrid stroke="#212A33" vertical={false} />
         <XAxis dataKey="day" stroke="#5B6672" fontSize={10} tickLine={false} axisLine={{ stroke: "#212A33" }} />
         <YAxis stroke="#5B6672" fontSize={11} tickLine={false} axisLine={false} allowDecimals={false} />
