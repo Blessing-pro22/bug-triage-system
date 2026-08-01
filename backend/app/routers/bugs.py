@@ -136,17 +136,22 @@ def get_prediction_explanation(bug_id: int, db: Session = Depends(get_db)):
 @router.patch("/{bug_id}", response_model=schemas.BugOut)
 @router.put("/{bug_id}", response_model=schemas.BugOut)
 def update_bug(bug_id: int, bug_update: schemas.BugUpdate, db: Session = Depends(get_db)):
-    db_bug = db.query(models.Bug).filter(models.Bug.id == bug_id).first()
-    if not db_bug:
-        raise HTTPException(status_code=404, detail="Bug not found")
+    try:
+        db_bug = db.query(models.Bug).filter(models.Bug.id == bug_id).first()
+        if not db_bug:
+            raise HTTPException(status_code=404, detail="Bug not found")
 
-    if bug_update.status is not None:
-        db_bug.status = str(bug_update.status).lower()
-    if bug_update.final_severity is not None:
-        db_bug.final_severity = str(bug_update.final_severity).lower()
-    if bug_update.final_team is not None:
-        db_bug.final_team = str(bug_update.final_team).lower()
+        if bug_update.status is not None:
+            db_bug.status = str(bug_update.status).lower()
+        if bug_update.final_severity is not None:
+            db_bug.final_severity = str(bug_update.final_severity).lower()
+        if bug_update.final_team is not None:
+            db_bug.final_team = str(bug_update.final_team).lower()
 
-    db.commit()
-    db.refresh(db_bug)
-    return db_bug
+        db.commit()
+        db.refresh(db_bug)
+        return db_bug
+    except Exception as e:
+        db.rollback()
+        print(f"Error updating bug {bug_id}: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to update bug: {str(e)}")

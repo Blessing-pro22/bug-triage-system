@@ -19,11 +19,12 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins for development
+    allow_origins=["https://bug-triage-system-eight.vercel.app", "*"],  # Allow specific Vercel origin and fallback
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["*"],
     expose_headers=["*"],
+    max_age=600,
 )
 
 app.include_router(bugs.router)
