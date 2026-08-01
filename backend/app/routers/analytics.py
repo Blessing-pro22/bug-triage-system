@@ -9,38 +9,53 @@ from .. import models, schemas
 
 router = APIRouter(prefix="/api/analytics", tags=["analytics"])
 
-
-@router.get("/summary", response_model=schemas.AnalyticsSummary)
+@router.get("/summary")
 def summary(db: Session = Depends(get_db)):
     bugs = db.query(models.Bug).all()
-    total = len(bugs)
-    open_count = sum(1 for b in bugs if b.status in (models.Status.new, models.Status.triaged, models.Status.assigned, models.Status.in_progress, models.Status.reopened))
-    resolved = [b for b in bugs if b.resolved_at is not None]
+    
+    # Use plain strings to safely match status values regardless of Enum attribute casing
+    open_statuses = {"open", "new", "triaged", "assigned", "in_progress", "reopened"}
+    
+    open_count = sum(1 for b in bugs if str(b.status).lower() in open_statuses)
+    closed_count = sum(1 for b in bugs if str(b.status).lower() in {"resolved", "closed"})
+    
+    return {
+        "total_bugs": len(bugs),
+        "open_bugs": open_count,
+        "closed_bugs": closed_count,
+    }
 
-    avg_hours = None
-    if resolved:
-        total_hours = sum(
-            (b.resolved_at - b.created_at).total_seconds() / 3600 for b in resolved
-        )
-        avg_hours = round(total_hours / len(resolved), 2)
+# @router.get("/summary", response_model=schemas.AnalyticsSummary)
+# def summary(db: Session = Depends(get_db)):
+#     bugs = db.query(models.Bug).all()
+#     total = len(bugs)
+#     open_count = sum(1 for b in bugs if b.status in (models.Status.new, models.Status.triaged, models.Status.assigned, models.Status.in_progress, models.Status.reopened))
+#     resolved = [b for b in bugs if b.resolved_at is not None]
 
-    by_severity = {}
-    by_team = {}
-    by_status = {}
-    for b in bugs:
-        by_severity[b.predicted_severity.value] = by_severity.get(b.predicted_severity.value, 0) + 1
-        by_team[b.predicted_team.value] = by_team.get(b.predicted_team.value, 0) + 1
-        by_status[b.status.value] = by_status.get(b.status.value, 0) + 1
+#     avg_hours = None
+#     if resolved:
+#         total_hours = sum(
+#             (b.resolved_at - b.created_at).total_seconds() / 3600 for b in resolved
+#         )
+#         avg_hours = round(total_hours / len(resolved), 2)
 
-    return schemas.AnalyticsSummary(
-        total_bugs=total,
-        open_bugs=open_count,
-        resolved_bugs=len(resolved),
-        avg_resolution_hours=avg_hours,
-        by_severity=by_severity,
-        by_team=by_team,
-        by_status=by_status,
-    )
+#     by_severity = {}
+#     by_team = {}
+#     by_status = {}
+#     for b in bugs:
+#         by_severity[b.predicted_severity.value] = by_severity.get(b.predicted_severity.value, 0) + 1
+#         by_team[b.predicted_team.value] = by_team.get(b.predicted_team.value, 0) + 1
+#         by_status[b.status.value] = by_status.get(b.status.value, 0) + 1
+
+#     return schemas.AnalyticsSummary(
+#         total_bugs=total,
+#         open_bugs=open_count,
+#         resolved_bugs=len(resolved),
+#         avg_resolution_hours=avg_hours,
+#         by_severity=by_severity,
+#         by_team=by_team,
+#         by_status=by_status,
+#     )
 
 
 @router.get("/trend")

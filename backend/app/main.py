@@ -30,6 +30,13 @@ app.include_router(analytics.router)
 def health_check():
     return {"status": "ok", "service": "bug-triage-api"}
 
+@app.get("/api/activity")
+def get_activity(db: Session = Depends(get_db)):
+    try:
+        return db.query(models.Bug).order_by(models.Bug.id.desc()).limit(10).all()
+    except Exception as e:
+        print(f"Error fetching activity: {e}")
+        return []
 
 @app.get("/debug-files")
 def debug_files():
