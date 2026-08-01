@@ -1,10 +1,11 @@
 import os
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from .routers import bugs, analytics
+
 from sqlalchemy.orm import Session
 
 from .database import Base, engine, get_db
-from .routers import bugs, analytics
 from . import models
 
 Base.metadata.create_all(bind=engine)
