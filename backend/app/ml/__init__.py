@@ -47,3 +47,4 @@ def predict_team(title: str, description: str):
 
     prediction = team_model.predict([text])[0]
     return str(prediction).lower(), round(confidence, 2)
+    

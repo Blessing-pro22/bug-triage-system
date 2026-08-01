@@ -10,3 +10,5 @@ __pycache__/
 
 # Ignore model binaries
 **/app/ml/models/*.joblib
+# Remove or comment out *.joblib if it's there:
+# *.joblib

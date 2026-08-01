@@ -1,10 +1,3 @@
-"""
-Optional compatibility trainer.
-
-GitBugs does NOT provide frontend/backend/security labels, so do not fabricate
-them from project names. This script retrains your existing team classifier
-from the original sample_data.csv if you still need that model.
-"""
 from pathlib import Path
 import joblib
 import pandas as pd

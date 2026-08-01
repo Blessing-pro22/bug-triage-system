@@ -29,6 +29,9 @@ app.add_middleware(
 app.include_router(bugs.router)
 app.include_router(analytics.router)
 
+@app.api_route("/", methods=["GET", "HEAD"])
+def root():
+    return {"status": "ok", "message": "Bug Triage API is running"}
 
 @app.get("/")
 def health_check():
