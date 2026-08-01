@@ -14,17 +14,16 @@ auth_models.Base.metadata.create_all(bind=engine)
 app = FastAPI(
     title="Automated Bug Triage System API",
     version="1.0.0",
+    redirect_slashes=False
 )
-
-# Make FastAPI flexible with trailing slashes
-app = FastAPI(redirect_slashes=False)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # Allow all origins for development
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 app.include_router(bugs.router)
