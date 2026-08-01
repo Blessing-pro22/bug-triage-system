@@ -97,25 +97,45 @@ def delete_bug(bug_id: int, db: Session = Depends(get_db)):
 
 @router.post("", response_model=schemas.BugOut, status_code=status.HTTP_201_CREATED)
 def create_bug(bug_in: schemas.BugCreate, db: Session = Depends(get_db)):
-    severity_pred, severity_conf = ml.predict_severity(bug_in.title, bug_in.description)
-    team_pred, team_conf = ml.predict_team(bug_in.title, bug_in.description)
+    try:
+        # 1. Safely run ML predictions with fallbacks if model fails
+        try:
+            severity_pred, severity_conf = ml.predict_severity(bug_in.title, bug_in.description)
+        except Exception as e:
+            print(f"ML Severity prediction failed: {e}")
+            severity_pred, severity_conf = "major", 0.50
 
-    db_bug = models.Bug(
-        title=bug_in.title,
-        description=bug_in.description,
-        reporter=bug_in.reporter,
-        predicted_severity=severity_pred,
-        predicted_team=team_pred,
-        severity_confidence=severity_conf,
-        team_confidence=team_conf,
-        status="new"
-    )
+        try:
+            team_pred, team_conf = ml.predict_team(bug_in.title, bug_in.description)
+        except Exception as e:
+            print(f"ML Team prediction failed: {e}")
+            team_pred, team_conf = "backend", 0.50
 
-    db.add(db_bug)
-    db.commit()
-    db.refresh(db_bug)
+        # 2. Build model object using lowercase enum values
+        db_bug = models.Bug(
+            title=bug_in.title,
+            description=bug_in.description,
+            reporter=bug_in.reporter if hasattr(bug_in, 'reporter') else "Anonymous",
+            predicted_severity=str(severity_pred).lower(),
+            predicted_team=str(team_pred).lower(),
+            severity_confidence=float(severity_conf or 0.5),
+            team_confidence=float(team_conf or 0.5),
+            status="new"
+        )
 
-    return db_bug
+        db.add(db_bug)
+        db.commit()
+        db.refresh(db_bug)
+
+        return db_bug
+
+    except Exception as err:
+        db.rollback()
+        print(f"CRITICAL ERROR IN POST /api/bugs: {err}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Could not create bug: {str(err)}"
+        )
 
 
 @router.post("/{bug_id}/feedback", response_model=schemas.FeedbackOut)
