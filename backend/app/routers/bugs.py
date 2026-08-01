@@ -1,6 +1,6 @@
 import datetime
 from typing import List
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy import desc
 
@@ -95,7 +95,6 @@ def delete_bug(bug_id: int, db: Session = Depends(get_db)):
     db.delete(bug)
     db.commit()
 
-@router.post("", response_model=schemas.BugOut, status_code=status.HTTP_211_CREATED if hasattr(status, 'HTTP_211_CREATED') else 201)
 @router.post("", response_model=schemas.BugOut, status_code=status.HTTP_201_CREATED)
 def create_bug(bug_in: schemas.BugCreate, db: Session = Depends(get_db)):
     severity_pred, severity_conf = ml.predict_severity(bug_in.title, bug_in.description)
