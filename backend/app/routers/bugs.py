@@ -95,15 +95,36 @@ def delete_bug(bug_id: int, db: Session = Depends(get_db)):
     db.delete(bug)
     db.commit()
 
+@router.post("", response_model=schemas.BugOut, status_code=status.HTTP_211_CREATED if hasattr(status, 'HTTP_211_CREATED') else 201)
+@router.post("", response_model=schemas.BugOut, status_code=status.HTTP_201_CREATED)
+def create_bug(bug_in: schemas.BugCreate, db: Session = Depends(get_db)):
+    severity_pred, severity_conf = ml.predict_severity(bug_in.title, bug_in.description)
+    team_pred, team_conf = ml.predict_team(bug_in.title, bug_in.description)
+
+    db_bug = models.Bug(
+        title=bug_in.title,
+        description=bug_in.description,
+        reporter=bug_in.reporter,
+        predicted_severity=severity_pred,
+        predicted_team=team_pred,
+        severity_confidence=severity_conf,
+        team_confidence=team_conf,
+        status="new"
+    )
+
+    db.add(db_bug)
+    db.commit()
+    db.refresh(db_bug)
+
+    return db_bug
+
 
 @router.post("/{bug_id}/feedback", response_model=schemas.FeedbackOut)
 def submit_feedback(bug_id: int, payload: schemas.FeedbackCreate, db: Session = Depends(get_db)):
-    """Submit human correction feedback for AI classification."""
     bug = db.query(models.Bug).filter(models.Bug.id == bug_id).first()
     if not bug:
         raise HTTPException(status_code=404, detail="Bug not found")
     
-    # Update bug with corrections
     if payload.corrected_severity:
         bug.final_severity = payload.corrected_severity
     if payload.corrected_team:
@@ -112,9 +133,8 @@ def submit_feedback(bug_id: int, payload: schemas.FeedbackCreate, db: Session = 
     db.commit()
     db.refresh(bug)
     
-    # Return feedback record
     return {
-        "id": bug_id,  # Using bug_id as feedback_id for simplicity
+        "id": bug_id,  
         "bug_id": bug_id,
         "original_severity": bug.predicted_severity.value,
         "original_team": bug.predicted_team.value,
@@ -126,7 +146,6 @@ def submit_feedback(bug_id: int, payload: schemas.FeedbackCreate, db: Session = 
 
 @router.get("/activity")
 def get_recent_activity(db: Session = Depends(get_db)):
-    """Returns recent bug submissions for the dashboard activity feed."""
     try:
         recent_bugs = (
             db.query(models.Bug)

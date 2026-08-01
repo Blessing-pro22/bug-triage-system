@@ -14,6 +14,9 @@ app = FastAPI(
     version="1.0.0",
 )
 
+# Make FastAPI flexible with trailing slashes
+app = FastAPI(redirect_slashes=False)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
