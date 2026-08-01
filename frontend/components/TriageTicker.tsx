@@ -9,12 +9,6 @@ const SEVERITY_COLORS: Record<string, string> = {
   trivial: "#5B6672",
 };
 
-/**
- * The signature element of the dashboard: a stock-ticker-style strip
- * showing the classifier's most recent decisions in real time, in the
- * spirit of a triage desk's live queue. Doubles the list so the CSS
- * scroll animation loops seamlessly.
- */
 export default function TriageTicker({ bugs }: { bugs: Bug[] }) {
   if (bugs.length === 0) return null;
   const doubled = [...bugs, ...bugs];

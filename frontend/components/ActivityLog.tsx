@@ -20,9 +20,10 @@ export default function ActivityLog() {
     async function loadActivities() {
       try {
         const data = await api.getActivityLog();
-        setActivities(data.slice(0, 10)); // Show last 10 activities
+        setActivities(Array.isArray(data) ? data.slice(0, 10) : []); // Safe array check
       } catch (err) {
         console.error("Failed to load activity log", err);
+        setActivities([]);
       } finally {
         setLoading(false);
       }
@@ -30,8 +31,11 @@ export default function ActivityLog() {
     loadActivities();
   }, []);
 
-  const getActionIcon = (action: string) => {
-    switch (action.toLowerCase()) {
+  const getActionIcon = (action?: string | null) => {
+    // Safe fallback + lowercase check
+    const safeAction = (action || "").toLowerCase();
+
+    switch (safeAction) {
       case "status_changed":
         return <Edit className="w-4 h-4 text-[#F4D35E]" />;
       case "ai_classified":
@@ -45,8 +49,11 @@ export default function ActivityLog() {
     }
   };
 
-  const formatTime = (dateString: string) => {
+  const formatTime = (dateString?: string | null) => {
+    if (!dateString) return "Recently";
     const date = new Date(dateString);
+    if (isNaN(date.getTime())) return "Recently";
+
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffMins = Math.floor(diffMs / 60000);
@@ -90,27 +97,27 @@ export default function ActivityLog() {
         <span className="text-paper/40 text-xs font-mono uppercase tracking-wider">Last 10 events</span>
       </div>
 
-      {activities.length === 0 ? (
+      {!activities || activities.length === 0 ? (
         <div className="text-center py-8">
           <Activity className="w-12 h-12 text-paper/20 mx-auto mb-3" />
           <p className="text-paper/40 text-sm">No recent activity</p>
         </div>
       ) : (
         <div className="space-y-3">
-          {activities.map((activity) => (
+          {activities.map((activity, index) => (
             <div
-              key={activity.id}
+              key={activity.id || index}
               className="flex items-start gap-3 p-4 bg-panel/30 rounded-xl border border-line/30 hover:border-line/50 transition-colors"
             >
               <div className="p-2 bg-panel/50 rounded-lg shrink-0">
                 {getActionIcon(activity.action)}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-paper/80 text-sm mb-1">{activity.details}</p>
+                <p className="text-paper/80 text-sm mb-1">{activity.details || "System activity recorded"}</p>
                 <div className="flex items-center gap-3 text-paper/40 text-xs">
                   <span className="flex items-center gap-1">
                     <User className="w-3 h-3" />
-                    {activity.user}
+                    {activity.user || "System"}
                   </span>
                   <span className="flex items-center gap-1">
                     <Clock className="w-3 h-3" />
