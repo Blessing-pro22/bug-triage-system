@@ -26,9 +26,9 @@ export default function DashboardPage() {
         api.analyticsSummary(),
         api.analyticsTrend(),
       ]);
-      setBugs(b);
+      setBugs(b || []);
       setSummary(s);
-      setTrend(t);
+      setTrend(t || []);
     } catch (e: any) {
       setError(e.message || "Could not reach the API. Is the backend running on :8000?");
     } finally {
@@ -42,8 +42,12 @@ export default function DashboardPage() {
   }, [filters]);
 
   async function setBugStatus(id: number, status: Status) {
-    await api.updateBug(id, { status });
-    loadAll();
+    try {
+      await api.updateBug(id, { status });
+      await loadAll();
+    } catch (err) {
+      console.error(`Failed to update bug #${id} status to ${status}`, err);
+    }
   }
 
   if (error) {
@@ -218,8 +222,8 @@ export default function DashboardPage() {
                       <TeamBadge team={bug.final_team || bug.predicted_team} />
                       <StatusBadge status={bug.status} />
                     </div>
-                    <h3 className="font-medium text-paper truncate text-sm sm:text-base">{bug.title}</h3>
-                    <p className="text-paper/50 text-sm mt-0.5 line-clamp-1 text-xs sm:text-sm">{bug.description}</p>
+                    <h3 className="font-medium text-paper truncate text-sm sm:text-base">{bug.title || "Untitled Bug"}</h3>
+                    <p className="text-paper/50 text-sm mt-0.5 line-clamp-1 text-xs sm:text-sm">{bug.description || "No description provided."}</p>
                     <p className="font-mono text-[10px] sm:text-[11px] text-paper/30 mt-2 flex items-center gap-2 sm:gap-3 flex-wrap">
                       <span className="flex items-center gap-1.5">
                         <Brain className="w-3 h-3 text-accent" />
@@ -342,7 +346,7 @@ function ActionButton({ onClick, children }: { onClick: (e: React.MouseEvent) =>
   return (
     <button
       onClick={onClick}
-      className="font-mono text-[11px] uppercase tracking-wider px-4 py-2 rounded-lg border border-line/50 text-paper/70 hover:border-accent hover:text-accent hover:bg-accent/10 transition-all duration-200 shadow-sm hover:shadow-md"
+      className="font-mono text-[11px] uppercase tracking-wider px-4 py-2 rounded-lg border border-line/50 text-paper/70 hover:border-accent hover:text-accent hover:bg-accent/10 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer"
     >
       {children}
     </button>

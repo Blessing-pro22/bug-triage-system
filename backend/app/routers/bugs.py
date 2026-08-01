@@ -64,27 +64,40 @@ def get_bug(bug_id: int, db: Session = Depends(get_db)):
     return bug
 
 
-@router.patch("/{bug_id}", response_model=schemas.BugOut)
-def update_bug(bug_id: int, payload: schemas.BugUpdate, db: Session = Depends(get_db)):
-    """Update triage status, or override the auto-assigned severity/team.
-    Overrides are how the system improves: disagreements are the
-    signal that the model needs retraining on more representative data."""
-    bug = db.query(models.Bug).filter(models.Bug.id == bug_id).first()
-    if not bug:
-        raise HTTPException(status_code=404, detail="Bug not found")
+# @router.patch("/{bug_id}", response_model=schemas.BugOut)
+# def update_bug(bug_id: int, payload: schemas.BugUpdate, db: Session = Depends(get_db)):
+#     bug = db.query(models.Bug).filter(models.Bug.id == bug_id).first()
+#     if not bug:
+#         raise HTTPException(status_code=404, detail="Bug not found")
 
-    if payload.status is not None:
-        bug.status = payload.status
-        if payload.status in (models.Status.resolved, models.Status.closed) and not bug.resolved_at:
-            bug.resolved_at = datetime.datetime.utcnow()
-    if payload.final_severity is not None:
-        bug.final_severity = payload.final_severity
-    if payload.final_team is not None:
-        bug.final_team = payload.final_team
+#     if payload.status is not None:
+#         bug.status = payload.status
+#         if payload.status in (models.Status.resolved, models.Status.closed) and not bug.resolved_at:
+#             bug.resolved_at = datetime.datetime.utcnow()
+#     if payload.final_severity is not None:
+#         bug.final_severity = payload.final_severity
+#     if payload.final_team is not None:
+#         bug.final_team = payload.final_team
+
+#     db.commit()
+#     db.refresh(bug)
+#     return bug
+@router.put("/{bug_id}", response_model=schemas.BugOut)
+def update_bug(bug_id: int, bug_update: schemas.BugUpdate, db: Session = Depends(get_db)):
+    db_bug = db.query(models.Bug).filter(models.Bug.id == bug_id).first()
+    if not db_bug:
+        raise HTTPException(status_code=404, detail="Bug not found")
+    
+    if bug_update.status is not None:
+        db_bug.status = str(bug_update.status).lower()
+    if bug_update.final_severity is not None:
+        db_bug.final_severity = str(bug_update.final_severity).lower()
+    if bug_update.final_team is not None:
+        db_bug.final_team = str(bug_update.final_team).lower()
 
     db.commit()
-    db.refresh(bug)
-    return bug
+    db.refresh(db_bug)
+    return db_bug
 
 
 @router.delete("/{bug_id}", status_code=204)
