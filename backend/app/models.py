@@ -1,6 +1,6 @@
 import enum
 import datetime
-from sqlalchemy import Column, Integer, String, Text, DateTime, Float, Enum
+from sqlalchemy import Column, Integer, String, Text, DateTime, Float
 from .database import Base
 
 
@@ -25,7 +25,7 @@ class Status(str, enum.Enum):
     in_progress = "in_progress"
     resolved = "resolved"
     closed = "closed"
-    reopened = "reopened"
+    REOPENED = "reopened"
 
 
 class Bug(Base):
@@ -36,17 +36,17 @@ class Bug(Base):
     description = Column(Text, nullable=False)
     reporter = Column(String(120), nullable=True)
 
-    # ML-assigned fields (auto-triage)
-    predicted_severity = Column(Enum(Severity), nullable=False)
-    predicted_team = Column(Enum(Team), nullable=False)
+    # ML-assigned fields (stored as Strings to avoid PostgreSQL enum locking)
+    predicted_severity = Column(String(50), nullable=False)
+    predicted_team = Column(String(50), nullable=False)
     severity_confidence = Column(Float, nullable=True)
     team_confidence = Column(Float, nullable=True)
 
-    # Human-overridable fields — triage suggests, a person can correct
-    final_severity = Column(Enum(Severity), nullable=True)
-    final_team = Column(Enum(Team), nullable=True)
+    # Human-overridable fields
+    final_severity = Column(String(50), nullable=True)
+    final_team = Column(String(50), nullable=True)
 
-    status = Column(Enum(Status), default=Status.new, nullable=False)
+    status = Column(String(50), default="new", nullable=False)
 
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     resolved_at = Column(DateTime, nullable=True)
