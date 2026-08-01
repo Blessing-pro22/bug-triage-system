@@ -43,10 +43,13 @@ export default function DashboardPage() {
 
   async function setBugStatus(id: number, status: Status) {
     try {
+      console.log(`Updating bug #${id} to status: ${status}`);
       await api.updateBug(id, { status });
+      console.log(`Successfully updated bug #${id}`);
       await loadAll();
     } catch (err) {
       console.error(`Failed to update bug #${id} status to ${status}`, err);
+      alert(`Failed to update bug status: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
   }
 

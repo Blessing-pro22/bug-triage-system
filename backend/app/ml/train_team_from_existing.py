@@ -4,7 +4,7 @@ import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.pipeline import Pipeline
 from sklearn.svm import LinearSVC
-
+import os
 HERE = Path(__file__).resolve().parent
 DATA = HERE / "sample_data.csv"
 OUT = HERE / "models" / "team_model.joblib"
@@ -23,5 +23,11 @@ model = Pipeline([
 ])
 
 model.fit(df["text"], df["team"])
-joblib.dump(model, OUT)
-print(f"Saved existing team model -> {OUT}")
+
+# Define target models folder
+models_dir = os.path.join(os.path.dirname(__file__), "models")
+os.makedirs(models_dir, exist_ok=True)
+
+# Save with compress=3 to avoid binary pickling corruptions
+joblib.dump(model, os.path.join(models_dir, "team_model_gitbugs.joblib"), compress=3)
+print("✅ Models saved cleanly with compression!")
