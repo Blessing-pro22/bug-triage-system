@@ -1,7 +1,6 @@
 import datetime
 from typing import Optional
 from pydantic import BaseModel, Field
-from .models import Severity, Team, Status
 
 
 class BugCreate(BaseModel):
@@ -11,9 +10,9 @@ class BugCreate(BaseModel):
 
 
 class BugUpdate(BaseModel):
-    status: Optional[Status] = None
-    final_severity: Optional[Severity] = None
-    final_team: Optional[Team] = None
+    status: Optional[str] = None
+    final_severity: Optional[str] = None
+    final_team: Optional[str] = None
 
 
 class BugOut(BaseModel):
@@ -21,13 +20,13 @@ class BugOut(BaseModel):
     title: str
     description: str
     reporter: Optional[str]
-    predicted_severity: Severity
-    predicted_team: Team
+    predicted_severity: str
+    predicted_team: str
     severity_confidence: Optional[float]
     team_confidence: Optional[float]
-    final_severity: Optional[Severity]
-    final_team: Optional[Team]
-    status: Status
+    final_severity: Optional[str]
+    final_team: Optional[str]
+    status: str
     created_at: datetime.datetime
     resolved_at: Optional[datetime.datetime]
 
@@ -46,8 +45,8 @@ class AnalyticsSummary(BaseModel):
 
 
 class FeedbackCreate(BaseModel):
-    corrected_severity: Optional[Severity] = None
-    corrected_team: Optional[Team] = None
+    corrected_severity: Optional[str] = None
+    corrected_team: Optional[str] = None
 
 
 class FeedbackOut(BaseModel):
