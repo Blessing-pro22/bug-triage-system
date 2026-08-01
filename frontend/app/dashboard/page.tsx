@@ -201,8 +201,8 @@ export default function DashboardPage() {
           ) : (
             bugs.filter(bug => 
               searchQuery === "" || 
-              bug.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-              bug.description.toLowerCase().includes(searchQuery.toLowerCase())
+              (bug.title || "").toLowerCase().includes((searchQuery || "").toLowerCase()) ||
+              (bug.description || "").toLowerCase().includes((searchQuery || "").toLowerCase())
             ).map((bug, index) => (
               <div 
                 key={bug.id} 
