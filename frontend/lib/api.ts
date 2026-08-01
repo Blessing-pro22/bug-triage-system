@@ -65,13 +65,20 @@ export interface AIPerformance {
 }
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
+  const headers = { "Content-Type": "application/json", ...options?.headers };
+  console.log(`API Request: ${API_URL}${path}`, { method: options?.method, headers, body: options?.body });
+  
   const res = await fetch(`${API_URL}${path}`, {
-    headers: { "Content-Type": "application/json" },
+    headers,
     cache: "no-store",
     ...options,
   });
+  
+  console.log(`API Response: ${res.status} ${res.statusText}`);
+  
   if (!res.ok) {
     const body = await res.text();
+    console.error(`API Error: ${body}`);
     throw new Error(`API error ${res.status}: ${body}`);
   }
   if (res.status === 204) return undefined as T;
@@ -85,8 +92,12 @@ export const api = {
   },
   submitBug: (data: { title: string; description: string; reporter?: string }) =>
     request<Bug>("/api/bugs", { method: "POST", body: JSON.stringify(data) }),
-  updateBug: (id: number, data: Partial<{ status: Status; final_severity: Severity; final_team: Team }>) =>
-    request<Bug>(`/api/bugs/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
+  updateBug: (id: number, data: Partial<{ status: Status; final_severity: Severity; final_team: Team }>) => {
+    console.log("updateBug called with:", { id, data });
+    const body = JSON.stringify(data);
+    console.log("JSON body:", body);
+    return request<Bug>(`/api/bugs/${id}`, { method: "PATCH", body });
+  },
   deleteBug: (id: number) => request<void>(`/api/bugs/${id}`, { method: "DELETE" }),
   submitFeedback: (bugId: number, data: { corrected_severity?: Severity; corrected_team?: Team }) =>
     request<Feedback>(`/api/bugs/${bugId}/feedback`, { method: "POST", body: JSON.stringify(data) }),
