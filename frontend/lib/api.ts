@@ -1,4 +1,4 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://bug-triage-system.onrender.com";
 
 export type Severity = "trivial" | "minor" | "major" | "critical";
 export type Team = "frontend" | "backend" | "security";
