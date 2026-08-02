@@ -7,29 +7,84 @@ import numpy as np
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODELS_DIR = os.path.join(BASE_DIR, "models")
 
-def load_model_file(filename: str):
-    path = os.path.join(MODELS_DIR, filename)
-    if os.path.exists(path):
-        try:
-            model = joblib.load(path)
-            print(f"✅ Loaded model successfully: {path}")
-            return model
-        except Exception as e:
-            print(f"❌ Failed to load model binary at {path}: {e}")
-            return None
-    print(f"❌ Model file missing at: {path}")
-    return None
+# Load ML models
+models_dir = os.path.join(os.path.dirname(__file__), "models")
 
-severity_model = load_model_file("severity_model_gitbugs.joblib") or load_model_file("severity_model.joblib")
-team_model = load_model_file("team_model_gitbugs.joblib") or load_model_file("team_model.joblib")
+# Try to load improved severity model first, then fallback to original
+severity_model_improved_path = os.path.join(models_dir, "severity_model_improved.joblib")
+severity_model_path = os.path.join(models_dir, "severity_model.joblib")
+severity_model_gitbugs_path = os.path.join(models_dir, "severity_model_gitbugs.joblib")
+
+if os.path.exists(severity_model_improved_path):
+    try:
+        severity_model, severity_vectorizer = joblib.load(severity_model_improved_path)
+        print(f"✅ Loaded improved severity model: {severity_model_improved_path}")
+    except Exception as e:
+        print(f"❌ Failed to load improved model at {severity_model_improved_path}: {e}")
+        severity_model = None
+        severity_vectorizer = None
+elif os.path.exists(severity_model_path):
+    try:
+        severity_model, severity_vectorizer = joblib.load(severity_model_path)
+        print(f"✅ Loaded model successfully: {severity_model_path}")
+    except Exception as e:
+        print(f"❌ Failed to load model binary at {severity_model_path}: {e}")
+        severity_model = None
+        severity_vectorizer = None
+elif os.path.exists(severity_model_gitbugs_path):
+    try:
+        severity_model, severity_vectorizer = joblib.load(severity_model_gitbugs_path)
+        print(f"✅ Loaded model successfully: {severity_model_gitbugs_path}")
+    except Exception as e:
+        print(f"❌ Failed to load model binary at {severity_model_gitbugs_path}: {e}")
+        severity_model = None
+        severity_vectorizer = None
+else:
+    print(f"❌ Model file missing at: {severity_model_path}")
+    severity_model = None
+    severity_vectorizer = None
+
+# Try to load improved team model first, then fallback to original
+team_model_improved_path = os.path.join(models_dir, "team_model_improved.joblib")
+team_model_path = os.path.join(models_dir, "team_model.joblib")
+team_model_gitbugs_path = os.path.join(models_dir, "team_model_gitbugs.joblib")
+
+if os.path.exists(team_model_improved_path):
+    try:
+        team_model, team_vectorizer = joblib.load(team_model_improved_path)
+        print(f"✅ Loaded improved team model: {team_model_improved_path}")
+    except Exception as e:
+        print(f"❌ Failed to load improved model at {team_model_improved_path}: {e}")
+        team_model = None
+        team_vectorizer = None
+elif os.path.exists(team_model_path):
+    try:
+        team_model, team_vectorizer = joblib.load(team_model_path)
+        print(f"✅ Loaded model successfully: {team_model_path}")
+    except Exception as e:
+        print(f"❌ Failed to load model binary at {team_model_path}: {e}")
+        team_model = None
+        team_vectorizer = None
+elif os.path.exists(team_model_gitbugs_path):
+    try:
+        team_model, team_vectorizer = joblib.load(team_model_gitbugs_path)
+        print(f"✅ Loaded model successfully: {team_model_gitbugs_path}")
+    except Exception as e:
+        print(f"❌ Failed to load model binary at {team_model_gitbugs_path}: {e}")
+        team_model = None
+        team_vectorizer = None
+else:
+    print(f"❌ Model file missing at: {team_model_path}")
+    team_model = None
+    team_vectorizer = None
 
 def predict_severity(title: str, description: str):
     if not severity_model:
         return "major", 0.85
     text = f"{title} {description}"
     try:
-        prediction = severity_model.predict([text])[0]
-        confidence = float(max(severity_model.predict_proba([text])[0])) if hasattr(severity_model, "predict_proba") else 0.85
+        prediction = severity_model.predict(severity_vectorizer.transform([text]))[0]
+        confidence = float(max(severity_model.predict_proba(severity_vectorizer.transform([text]))[0])) if hasattr(severity_model, "predict_proba") else 0.85
         return str(prediction).lower(), round(confidence, 2)
     except Exception as e:
         print(f"Severity prediction error: {e}")
@@ -40,8 +95,8 @@ def predict_team(title: str, description: str):
         return "backend", 0.85
     text = f"{title} {description}"
     try:
-        prediction = team_model.predict([text])[0]
-        confidence = float(max(team_model.predict_proba([text])[0])) if hasattr(team_model, "predict_proba") else 0.85
+        prediction = team_model.predict(team_vectorizer.transform([text]))[0]
+        confidence = float(max(team_model.predict_proba(team_vectorizer.transform([text]))[0])) if hasattr(team_model, "predict_proba") else 0.85
         return str(prediction).lower(), round(confidence, 2)
     except Exception as e:
         print(f"Team prediction error: {e}")

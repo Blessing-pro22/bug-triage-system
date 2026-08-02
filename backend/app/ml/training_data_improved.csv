@@ -1,0 +1,31 @@
+title,description,severity,team
+"SQL injection vulnerability in user authentication","The login form is vulnerable to SQL injection attacks. An attacker can bypass authentication by injecting malicious SQL code into the username field. This exposes all user data and allows unauthorized access to the system. Immediate patch required.",critical,security
+"Authentication bypass allows admin access","Due to a session management flaw, regular users can escalate privileges to admin by modifying session tokens. This gives full control over the system including user data deletion and system configuration changes. Critical security vulnerability.",critical,security
+"Cross-site scripting (XSS) in user profile","User input in profile description is not sanitized, allowing attackers to inject malicious JavaScript that executes when other users view the profile. Can lead to session hijacking and data theft.",critical,security
+"Buffer overflow in image processing","The image upload handler has a buffer overflow vulnerability when processing specially crafted PNG files. This can lead to remote code execution and complete system compromise.",critical,security
+"Hardcoded API keys in source code","Production API keys and database credentials are hardcoded in the frontend JavaScript files. This exposes sensitive credentials to anyone who inspects the code.",critical,security
+"Database server crash under load","The application crashes when more than 100 concurrent users access the database. This causes complete service outage and potential data corruption.",critical,backend
+"Memory leak causes server exhaustion","The backend service has a memory leak that causes the server to run out of memory after 24 hours of operation. Requires server restart and causes downtime.",critical,backend
+"Payment processing fails intermittently","The payment gateway integration fails randomly during checkout, causing users to be charged but orders not processed. This affects revenue and user trust.",critical,backend
+"API endpoint returns wrong user data","The /api/users/{id} endpoint sometimes returns data for the wrong user due to a race condition. This is a serious privacy and security issue.",critical,backend
+"Session tokens not invalidated on logout","User sessions remain valid even after logout, allowing session hijacking if the token is stolen. This is a significant security vulnerability.",critical,security
+"Application crashes on mobile devices","The app crashes immediately upon launch on iOS devices running version 15.0 or higher. This prevents all mobile users from accessing the service.",major,frontend
+"Database connection pool exhausted","The application runs out of database connections during peak hours, causing 500 errors for all users. Performance degradation affects all users.",major,backend
+"Slow page load times on dashboard","The dashboard page takes 10+ seconds to load due to inefficient database queries. This impacts user experience and productivity.",major,frontend
+"User profile images not displaying","Profile images fail to load intermittently due to incorrect CDN configuration. This affects user experience but doesn't break functionality.",major,frontend
+"Search functionality returns no results","The search feature returns empty results even when matching items exist. This is a significant usability issue but doesn't break core functionality.",major,backend
+"Email notifications not sending","Transactional emails (password reset, verification) are not being sent to users. This affects user onboarding and account recovery.",major,backend
+"File upload fails for large files","File uploads fail for files larger than 5MB without proper error handling. Users are not informed of the failure.",major,frontend
+"CSS layout breaks on Safari","The main navigation menu is misaligned on Safari browsers, making it difficult to navigate the site. This affects Safari users specifically.",major,frontend
+"API rate limiting too aggressive","The API rate limit is set too low, causing legitimate users to be blocked. This affects third-party integrations and power users.",major,backend
+"Password reset link expires too quickly","Password reset links expire after 5 minutes, which is too short for users who may not check their email immediately. This causes user frustration.",major,backend
+"Minor typo in security login page","There is a small spelling error in the Forgot Password link on the login page. The word security is misspelled as secuity. This doesn't affect functionality but should be fixed for professionalism.",trivial,security
+"Incorrect color on success message","The success message after form submission uses the wrong color (red instead of green). This is confusing but doesn't affect functionality.",trivial,frontend
+"Extra space in email subject line","Email notifications have an extra space at the beginning of the subject line. This is a minor formatting issue.",trivial,backend
+"Help text has grammatical error","The help text for the search feature contains a grammatical error. This doesn't affect functionality but should be corrected.",trivial,frontend
+"Placeholder text missing in search field","The search field has no placeholder text, making it unclear what users should search for. Minor usability issue.",trivial,frontend
+"Footer link points to wrong page","The Privacy Policy link in the footer points to the Terms of Service page instead. This is a minor navigation issue.",trivial,frontend
+"Button hover state not working","The submit button doesn't change color on hover, making it less interactive. This is a minor UX improvement.",trivial,frontend
+"Log message has incorrect timestamp","Backend log messages show the wrong timezone in timestamps. This doesn't affect functionality but makes debugging harder.",trivial,backend
+"Comment in code is outdated","An inline comment in the authentication module refers to an old implementation. This is a code maintenance issue.",trivial,backend
+"Default value for setting is wrong","The default value for the items per page setting is 25 instead of the intended 10. This is a minor configuration issue.",trivial,frontend
