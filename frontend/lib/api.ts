@@ -87,7 +87,11 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 
 export const api = {
   listBugs: (params?: { status?: string; team?: string; severity?: string }) => {
-    const qs = new URLSearchParams(params as Record<string, string>).toString();
+    // Filter out undefined values before creating query string
+    const filteredParams = Object.fromEntries(
+      Object.entries(params || {}).filter(([_, v]) => v !== undefined && v !== "")
+    );
+    const qs = new URLSearchParams(filteredParams).toString();
     return request<Bug[]>(`/api/bugs${qs ? `?${qs}` : ""}`);
   },
   submitBug: (data: { title: string; description: string; reporter?: string }) =>
