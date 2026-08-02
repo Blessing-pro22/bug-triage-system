@@ -79,27 +79,55 @@ else:
     team_vectorizer = None
 
 def predict_severity(title: str, description: str):
-    if not severity_model:
-        return "major", 0.85
+    if severity_model is None or severity_vectorizer is None:
+        return "major", 0.50
     text = f"{title} {description}"
     try:
-        prediction = severity_model.predict(severity_vectorizer.transform([text]))[0]
-        confidence = float(max(severity_model.predict_proba(severity_vectorizer.transform([text]))[0])) if hasattr(severity_model, "predict_proba") else 0.85
+        vec_text = severity_vectorizer.transform([text])
+        prediction = severity_model.predict(vec_text)[0]
+        
+        # Calculate decision score confidence safely for LinearSVC
+        if hasattr(severity_model, "predict_proba"):
+            confidence = float(max(severity_model.predict_proba(vec_text)[0]))
+        elif hasattr(severity_model, "decision_function"):
+            scores = severity_model.decision_function(vec_text)[0]
+            if isinstance(scores, np.ndarray) and scores.ndim > 0:
+                exp_scores = np.exp(scores - np.max(scores))
+                confidence = float(np.max(exp_scores / exp_scores.sum()))
+            else:
+                confidence = 0.85
+        else:
+            confidence = 0.85
+
         return str(prediction).lower(), round(confidence, 2)
     except Exception as e:
-        print(f"Severity prediction error: {e}")
+        print(f"❌ Severity prediction error: {e}")
         return "major", 0.50
 
 def predict_team(title: str, description: str):
-    if not team_model:
-        return "backend", 0.85
+    if team_model is None or team_vectorizer is None:
+        return "backend", 0.50
     text = f"{title} {description}"
     try:
-        prediction = team_model.predict(team_vectorizer.transform([text]))[0]
-        confidence = float(max(team_model.predict_proba(team_vectorizer.transform([text]))[0])) if hasattr(team_model, "predict_proba") else 0.85
+        vec_text = team_vectorizer.transform([text])
+        prediction = team_model.predict(vec_text)[0]
+        
+        # Calculate decision score confidence safely for LinearSVC
+        if hasattr(team_model, "predict_proba"):
+            confidence = float(max(team_model.predict_proba(vec_text)[0]))
+        elif hasattr(team_model, "decision_function"):
+            scores = team_model.decision_function(vec_text)[0]
+            if isinstance(scores, np.ndarray) and scores.ndim > 0:
+                exp_scores = np.exp(scores - np.max(scores))
+                confidence = float(np.max(exp_scores / exp_scores.sum()))
+            else:
+                confidence = 0.85
+        else:
+            confidence = 0.85
+
         return str(prediction).lower(), round(confidence, 2)
     except Exception as e:
-        print(f"Team prediction error: {e}")
+        print(f"❌ Team prediction error: {e}")
         return "backend", 0.50
 
 # Initialize TF-IDF vectorizer for similarity search
