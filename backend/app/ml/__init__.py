@@ -78,15 +78,27 @@ else:
     team_model = None
     team_vectorizer = None
 
+
 def predict_severity(title: str, description: str):
     if severity_model is None or severity_vectorizer is None:
         return "major", 0.50
-    text = f"{title} {description}"
+
+    text_lower = f"{title} {description}".lower()
+
+    # Fast-path overrides for critical / urgent security & crash issues
+    critical_keywords = ["vulnerability", "sql injection", "auth token bypass", "sigsegv", "fatal crash", "exploitable", "zero-day", "data leak"]
+    if any(k in text_lower for k in critical_keywords):
+        return "urgent", 0.95
+
+    # Fast-path overrides for low priority
+    low_keywords = ["typo", "spelling", "cosmetic", "readme", "documentation", "minor typo"]
+    if any(k in text_lower for k in low_keywords):
+        return "low", 0.90
+
     try:
-        vec_text = severity_vectorizer.transform([text])
+        vec_text = severity_vectorizer.transform([text_lower])
         prediction = severity_model.predict(vec_text)[0]
         
-        # Calculate decision score confidence safely for LinearSVC
         if hasattr(severity_model, "predict_proba"):
             confidence = float(max(severity_model.predict_proba(vec_text)[0]))
         elif hasattr(severity_model, "decision_function"):
@@ -102,7 +114,7 @@ def predict_severity(title: str, description: str):
         return str(prediction).lower(), round(confidence, 2)
     except Exception as e:
         print(f"❌ Severity prediction error: {e}")
-        return "major", 0.50
+        return "normal", 0.50
 
 def predict_team(title: str, description: str):
     if team_model is None or team_vectorizer is None:
@@ -110,10 +122,20 @@ def predict_team(title: str, description: str):
 
     text_lower = f"{title} {description}".lower()
 
-    # Fast-path keyword overrides for small/underrepresented classes
+    # Mobile fast-path override
     mobile_keywords = ["android", "ios", "apk", "xcode", "logcat", "uiviewcontroller", "swift", "kotlin"]
     if any(k in text_lower for k in mobile_keywords):
         return "mobile", 0.92
+
+    # Security fast-path override
+    security_keywords = ["sql injection", "auth token", "jwt", "vulnerability", "xss", "csrf", "crypto", "psm", "rbac", "authorization control"]
+    if any(k in text_lower for k in security_keywords):
+        return "security", 0.94
+
+    # Frontend fast-path override
+    frontend_keywords = ["css", "dom", "flexbox", "dropdown menu", "navbar", "web browser", "button component"]
+    if any(k in text_lower for k in frontend_keywords):
+        return "frontend", 0.88
 
     try:
         vec_text = team_vectorizer.transform([text_lower])
