@@ -107,12 +107,18 @@ def predict_severity(title: str, description: str):
 def predict_team(title: str, description: str):
     if team_model is None or team_vectorizer is None:
         return "backend", 0.50
-    text = f"{title} {description}"
+
+    text_lower = f"{title} {description}".lower()
+
+    # Fast-path keyword overrides for small/underrepresented classes
+    mobile_keywords = ["android", "ios", "apk", "xcode", "logcat", "uiviewcontroller", "swift", "kotlin"]
+    if any(k in text_lower for k in mobile_keywords):
+        return "mobile", 0.92
+
     try:
-        vec_text = team_vectorizer.transform([text])
+        vec_text = team_vectorizer.transform([text_lower])
         prediction = team_model.predict(vec_text)[0]
         
-        # Calculate decision score confidence safely for LinearSVC
         if hasattr(team_model, "predict_proba"):
             confidence = float(max(team_model.predict_proba(vec_text)[0]))
         elif hasattr(team_model, "decision_function"):
