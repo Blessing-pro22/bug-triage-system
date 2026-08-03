@@ -14,7 +14,21 @@ AI-powered bug classification and prioritization system with human-in-the-loop f
 ✓ **Modern UI** - Glassmorphism design with loading skeletons and animations
 ✓ **Landing Page** - Professional introduction with feature highlights
 
-## Tech Stack
+##  Model Performance & Dataset Metrics
+
+| Metric | Accuracy | Dataset Volume | Primary Model | Feature Extraction |
+| :--- | :---: | :---: | :--- | :--- |
+| **Severity Classifier** | **90.23%** | 4,706 Reports | LinearSVC (`class_weight='balanced'`) | TF-IDF (Unigrams + Bigrams) |
+| **Team Routing Engine** | **77.81%** | 4,706 Reports | LinearSVC (`class_weight='balanced'`) | TF-IDF (Unigrams + Bigrams) |
+
+###  Dataset Class Distribution
+
+* ⚙️ **Backend**: `2,978` samples (63.2%)
+* 🎨 **Frontend**: `1,371` samples (29.1%)
+* 🔒 **Security**: `299` samples (6.3%)
+* 📱 **Mobile**: `58` samples (1.2%)
+
+### Tech Stack
 
 ### Frontend
 - **Framework**: Next.js 14 (App Router)
@@ -118,15 +132,16 @@ NEW → TRIAGED → ASSIGNED → IN PROGRESS → RESOLVED → CLOSED
 The ML model classifies bug reports into:
 
 **Severity Levels:**
-- Critical
+- Urgent / Critical
 - Major
-- Minor
-- Trivial
+- Low
+- Normal
 
 **Teams:**
 - Frontend
 - Backend
 - Security
+- Mobile
 
 **Confidence Indicators:**
 - High confidence (≥80%)
