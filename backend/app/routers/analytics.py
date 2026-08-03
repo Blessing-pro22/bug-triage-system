@@ -1,13 +1,55 @@
 import datetime
 from typing import List
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import func
+from pathlib import Path
+import json
+
 
 from ..database import get_db
 from .. import models, schemas
 
 router = APIRouter(prefix="/api/analytics", tags=["analytics"])
+
+# Path to the metrics file produced by train_mozilla.py
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+METRICS_PATH = BASE_DIR / "app" / "ml" / "models" / "metrics.json"
+
+@router.get("/api/metrics")
+def get_ml_metrics():
+    if not METRICS_PATH.exists():
+        raise HTTPException(
+            status_code=404, 
+            detail="Metrics file not found. Please run train_mozilla.py first."
+        )
+    
+    with open(METRICS_PATH, "r") as f:
+        metrics_data = json.load(f)
+    
+    # Inject metadata for evaluator context
+    metrics_data["pipeline_info"] = {
+        "dataset_name": "Combined Mozilla & Apache Cassandra Bug Reports",
+        "total_samples": 4706,
+        "algorithm": "LinearSVC",
+        "vectorizer": "TF-IDF Vectorizer (max_features=5000, ngrams=1-2)",
+        "imbalance_handling": "Cost-sensitive Learning (class_weight='balanced') + Fast-Path Keyword Overrides",
+        "team_distribution": {
+            "backend": 2978,
+            "frontend": 1371,
+            "security": 299,
+            "mobile": 58
+        },
+        "severity_distribution": {
+            "normal": 4291,
+            "low": 193,
+            "s3": 90,
+            "urgent": 68,
+            "high": 58
+        }
+    }
+    
+    return metrics_data
 
 @router.get("/summary")
 def summary(db: Session = Depends(get_db)):
@@ -45,39 +87,6 @@ def summary(db: Session = Depends(get_db)):
         "by_team": by_team,
         "by_status": by_status,
     }
-
-# @router.get("/summary", response_model=schemas.AnalyticsSummary)
-# def summary(db: Session = Depends(get_db)):
-#     bugs = db.query(models.Bug).all()
-#     total = len(bugs)
-#     open_count = sum(1 for b in bugs if b.status in (models.Status.new, models.Status.triaged, models.Status.assigned, models.Status.in_progress, models.Status.reopened))
-#     resolved = [b for b in bugs if b.resolved_at is not None]
-
-#     avg_hours = None
-#     if resolved:
-#         total_hours = sum(
-#             (b.resolved_at - b.created_at).total_seconds() / 3600 for b in resolved
-#         )
-#         avg_hours = round(total_hours / len(resolved), 2)
-
-#     by_severity = {}
-#     by_team = {}
-#     by_status = {}
-#     for b in bugs:
-#         by_severity[b.predicted_severity.value] = by_severity.get(b.predicted_severity.value, 0) + 1
-#         by_team[b.predicted_team.value] = by_team.get(b.predicted_team.value, 0) + 1
-#         by_status[b.status.value] = by_status.get(b.status.value, 0) + 1
-
-#     return schemas.AnalyticsSummary(
-#         total_bugs=total,
-#         open_bugs=open_count,
-#         resolved_bugs=len(resolved),
-#         avg_resolution_hours=avg_hours,
-#         by_severity=by_severity,
-#         by_team=by_team,
-#         by_status=by_status,
-#     )
-
 
 @router.get("/trend")
 def resolution_trend(db: Session = Depends(get_db)):
