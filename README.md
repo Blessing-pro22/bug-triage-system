@@ -144,9 +144,9 @@ The ML model classifies bug reports into:
 - Mobile
 
 **Confidence Indicators:**
-- High confidence (≥80%)
-- Medium confidence (60-79%)
-- Low confidence (<60%)
+- High confidence (≥70%)
+- Medium confidence (50-69%)
+- Low confidence (<50%)
 
 ## Human-in-the-Loop
 
