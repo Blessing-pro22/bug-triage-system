@@ -2,6 +2,18 @@
 
 AI-powered bug classification and prioritization system with human-in-the-loop feedback.
 
+## Project Overview
+
+The Automated Bug Triage System is a DevOps application that uses machine learning to automate the bug triage process. It analyzes bug reports, classifies them into appropriate categories, assigns priority levels, recommends the most suitable developer or team, and provides analytics to improve software maintenance and resolution efficiency.
+
+### Objectives
+
+- Automate bug classification using machine learning.
+- Reduce manual effort in assigning bugs.
+- Prioritize bugs based on severity and impact.
+- Track the complete bug lifecycle from creation to resolution.
+- Provide analytics and reporting for better decision-making.
+
 ## Features
 
 ✓ **Automated Bug Classification** - ML-powered severity and team assignment
