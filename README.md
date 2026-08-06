@@ -38,7 +38,7 @@ The Automated Bug Triage System is a DevOps application that uses machine learni
 * ⚙️ **Backend**: `2,978` samples (63.2%)
 * 🎨 **Frontend**: `1,371` samples (29.1%)
 * 🔒 **Security**: `299` samples (6.3%)
-* 📱 **Mobile**: `58` samples (1.2%)
+* 📱 **Mobile**: `58` samples (1.4%)
 
 ### Tech Stack
 
